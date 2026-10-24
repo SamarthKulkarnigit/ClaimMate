@@ -1,0 +1,58 @@
+{
+  "title": "Reused photo from an earlier claim",
+  "story": "Someone scraped my rear bumper in the office parking lot.",
+  "accident_date": "2026-10-19",
+  "vehicle": {
+    "make": "Maruti Suzuki",
+    "model": "swift",
+    "reg_no": "KA01AB1234",
+    "cc": 1197,
+    "reg_date": "2024-03-10"
+  },
+  "policy": {
+    "policy_no": "OD/2026/778812",
+    "start": "2026-03-01",
+    "end": "2027-02-28",
+    "idv": 550000,
+    "zero_dep": false,
+    "voluntary_deductible": 0
+  },
+  "photos": [
+    "old_claim.jpg"
+  ],
+  "expected": {
+    "audit": "escalate",
+    "covered": [
+      "rear_bumper"
+    ],
+    "not_covered": []
+  },
+  "mock": {
+    "damage": {
+      "old_claim.jpg": {
+        "parts": [
+          {
+            "part": "rear_bumper",
+            "side": "rear",
+            "severity": "minor",
+            "action": "repair",
+            "confidence": 0.8,
+            "evidence": "scrape marks"
+          }
+        ],
+        "plate": null,
+        "quality": "ok"
+      }
+    },
+    "story_check": [
+      {
+        "story_zone": "rear",
+        "damage_zones": [
+          "rear"
+        ],
+        "consistent": true,
+        "detail": "Matches."
+      }
+    ]
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "_note": "Part vocabulary shared by the vision prompt, price table and UI. Labour/paint ranges in INR are ASSUMPTIONS for a hatchback/sedan at an authorised workshop; shown as such in the UI and claim file.",
+  "parts": {
+    "front_bumper":       {"name": "Front bumper",            "material": "plastic", "zone": "front", "repair": [800, 1500],  "replace_labour": [500, 900],   "paint": [2500, 4000]},
+    "rear_bumper":        {"name": "Rear bumper",             "material": "plastic", "zone": "rear",  "repair": [800, 1500],  "replace_labour": [500, 900],   "paint": [2500, 4000]},
+    "headlamp":           {"name": "Headlamp assembly",       "material": "plastic", "zone": "front", "repair": null,         "replace_labour": [300, 600],   "paint": null},
+    "tail_lamp":          {"name": "Tail lamp assembly",      "material": "plastic", "zone": "rear",  "repair": null,         "replace_labour": [200, 500],   "paint": null},
+    "fog_lamp":           {"name": "Fog lamp",                "material": "plastic", "zone": "front", "repair": null,         "replace_labour": [200, 400],   "paint": null},
+    "grille":             {"name": "Front grille",            "material": "plastic", "zone": "front", "repair": null,         "replace_labour": [200, 400],   "paint": null},
+    "bonnet":             {"name": "Bonnet / hood",           "material": "metal",   "zone": "front", "repair": [1500, 3000], "replace_labour": [800, 1500],  "paint": [3500, 5500]},
+    "boot_lid":           {"name": "Boot lid / tailgate",     "material": "metal",   "zone": "rear",  "repair": [1500, 3000], "replace_labour": [800, 1500],  "paint": [3500, 5500]},
+    "front_fender":       {"name": "Front fender",            "material": "metal",   "zone": "front", "repair": [1000, 2000], "replace_labour": [600, 1200],  "paint": [2500, 4000]},
+    "rear_quarter_panel": {"name": "Rear quarter panel",      "material": "metal",   "zone": "rear",  "repair": [1500, 3500], "replace_labour": [2500, 4500], "paint": [3000, 5000]},
+    "front_door":         {"name": "Front door",              "material": "metal",   "zone": "side",  "repair": [1500, 3000], "replace_labour": [1000, 1800], "paint": [3000, 5000]},
+    "rear_door":          {"name": "Rear door",               "material": "metal",   "zone": "side",  "repair": [1500, 3000], "replace_labour": [1000, 1800], "paint": [3000, 5000]},
+    "side_mirror":        {"name": "Outside rear-view mirror","material": "plastic", "zone": "side",  "repair": null,         "replace_labour": [200, 400],   "paint": null},
+    "windshield":         {"name": "Front windshield",        "material": "glass",   "zone": "front", "repair": null,         "replace_labour": [800, 1500],  "paint": null},
+    "rear_windshield":    {"name": "Rear windshield",         "material": "glass",   "zone": "rear",  "repair": null,         "replace_labour": [800, 1500],  "paint": null},
+    "radiator":           {"name": "Radiator",                "material": "metal",   "zone": "front", "repair": null,         "replace_labour": [800, 1500],  "paint": null},
+    "alloy_wheel":        {"name": "Wheel rim",               "material": "metal",   "zone": "side",  "repair": [800, 1500],  "replace_labour": [200, 400],   "paint": null},
+    "tyre":               {"name": "Tyre",                    "material": "rubber",  "zone": "side",  "repair": null,         "replace_labour": [200, 400],   "paint": null}
+  }
+}

@@ -1,0 +1,85 @@
+{
+  "title": "Clean claim \u2014 Swift front collision",
+  "story": "While parking at the mall my car rolled forward and hit a concrete pole at low speed.",
+  "accident_date": "2026-10-20",
+  "vehicle": {
+    "make": "Maruti Suzuki",
+    "model": "swift",
+    "reg_no": "KA01AB1234",
+    "cc": 1197,
+    "reg_date": "2024-03-10"
+  },
+  "policy": {
+    "policy_no": "OD/2026/778812",
+    "start": "2026-03-01",
+    "end": "2027-02-28",
+    "idv": 550000,
+    "zero_dep": false,
+    "voluntary_deductible": 0
+  },
+  "photos": [
+    "front1.jpg",
+    "front2.jpg"
+  ],
+  "expected": {
+    "audit": "pass",
+    "covered": [
+      "front_bumper",
+      "headlamp",
+      "bonnet"
+    ],
+    "not_covered": []
+  },
+  "mock": {
+    "damage": {
+      "front1.jpg": {
+        "parts": [
+          {
+            "part": "front_bumper",
+            "side": "front",
+            "severity": "moderate",
+            "action": "replace",
+            "confidence": 0.88,
+            "evidence": "cracked bumper cover"
+          },
+          {
+            "part": "headlamp",
+            "side": "front",
+            "severity": "severe",
+            "action": "replace",
+            "confidence": 0.91,
+            "evidence": "shattered right headlamp"
+          }
+        ],
+        "plate": "KA 01 AB 1234",
+        "quality": "ok",
+        "structural": false
+      },
+      "front2.jpg": {
+        "parts": [
+          {
+            "part": "bonnet",
+            "side": "front",
+            "severity": "minor",
+            "action": "repair",
+            "confidence": 0.76,
+            "evidence": "small dent on bonnet edge"
+          }
+        ],
+        "plate": null,
+        "quality": "ok",
+        "structural": false
+      }
+    },
+    "story_check": [
+      {
+        "story_zone": "front",
+        "damage_zones": [
+          "front"
+        ],
+        "consistent": true,
+        "detail": "Story (hit a pole while parking) matches front damage."
+      }
+    ]
+  }
+}
