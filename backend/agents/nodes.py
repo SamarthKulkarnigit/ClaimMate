@@ -7,6 +7,7 @@ from __future__ import annotations
 import json
 import re
 from datetime import date, datetime
+from concurrent.futures import ThreadPoolExecutor
 from functools import wraps
 
 from langgraph.types import interrupt
@@ -26,6 +27,39 @@ from backend.agents.state import ClaimState
 
 PARTS = rules.parts_catalog()
 PART_KEYS = list(PARTS.keys())
+
+# Names vision models commonly use instead of our part keys.
+PART_ALIASES = {
+    "hood": "bonnet", "front_hood": "bonnet",
+    "front_windshield": "windshield", "windscreen": "windshield", "front_windscreen": "windshield",
+    "front_glass": "windshield", "wind_shield": "windshield",
+    "rear_window": "rear_windshield", "rear_glass": "rear_windshield", "back_glass": "rear_windshield",
+    "rear_windscreen": "rear_windshield", "back_windshield": "rear_windshield", "hatch_glass": "rear_windshield",
+    "tail_light": "tail_lamp", "taillight": "tail_lamp", "taillamp": "tail_lamp", "rear_light": "tail_lamp",
+    "rear_lamp": "tail_lamp", "headlight": "headlamp", "head_light": "headlamp", "head_lamp": "headlamp",
+    "fog_light": "fog_lamp", "fender": "front_fender", "wing": "front_fender", "door": "front_door",
+    "driver_door": "front_door", "passenger_door": "front_door", "mirror": "side_mirror",
+    "wing_mirror": "side_mirror", "rear_view_mirror": "side_mirror", "wheel": "alloy_wheel", "rim": "alloy_wheel",
+    "tire": "tyre", "trunk": "boot_lid", "tailgate": "boot_lid", "hatch": "boot_lid", "boot": "boot_lid",
+    "quarter_panel": "rear_quarter_panel", "side_window": "side_window_glass", "door_glass": "side_window_glass",
+    "window": "side_window_glass", "door_window": "side_window_glass", "quarter_glass": "side_window_glass",
+    "front_grille": "grille",
+}
+
+
+def _part_key(raw, side: str | None = None) -> str | None:
+    """Map a vision model's part name onto PART_KEYS; None if it cannot be mapped."""
+    k = re.sub(r"[^a-z0-9]+", "_", str(raw or "").lower()).strip("_")
+    if k in PARTS:
+        return k
+    for prefix in ("left_", "right_", "lh_", "rh_"):
+        if k.startswith(prefix):
+            k = k[len(prefix):]
+            if k in PARTS:
+                return k
+    if k == "bumper":
+        return "rear_bumper" if side == "rear" else "front_bumper"
+    return PART_ALIASES.get(k)
 
 
 def agent(name: str):
@@ -140,7 +174,7 @@ def damage(state: ClaimState):
     merged: dict[tuple, dict] = {}
     plate, quality, structural = None, [], False
 
-    for idx, ph in enumerate(state.get("photos", [])):
+    def assess(ph: dict) -> tuple[dict, str | None]:
         user = "Assess this photo."
         if hint:
             user += f" A re-check was requested by the auditor: {hint} Look carefully at which END of the car (front or rear) is damaged."
@@ -149,22 +183,36 @@ def damage(state: ClaimState):
         if state.get("retries") and _mock(state, "damage_recheck"):
             mock_val = _mock(state, "damage_recheck").get(ph["id"], mock_val)
         try:
-            res = chat_json(DAMAGE_SYSTEM, user, models=config.VISION_MODELS, images=[ph["path"]],
-                            mock=mock_val or {"parts": [], "plate": None, "quality": "ok"})
+            return chat_json(DAMAGE_SYSTEM, user, models=config.VISION_MODELS, images=[ph["path"]],
+                             mock=mock_val or {"parts": [], "plate": None, "quality": "ok"}), None
         except LLMError as e:
-            emit(cid, "error", "damage", f"Vision failed on {ph['id']}: {e}")
-            res = {"parts": [], "plate": None, "quality": "blurry"}
+            return {"parts": [], "plate": None, "quality": "error"}, str(e)
 
-        quality.append({"photo": ph["id"], "quality": res.get("quality", "ok")})
+    photos = state.get("photos", [])
+    # Photos are independent; assess them concurrently (results stay in photo order).
+    with ThreadPoolExecutor(max_workers=max(1, min(4, len(photos)))) as pool:
+        results = list(pool.map(assess, photos))
+
+    for ph, (res, err) in zip(photos, results):
+        if err:
+            emit(cid, "error", "damage", f"Vision failed on {ph['id']}: {err}", {"photo": ph["id"]})
+        quality.append({"photo": ph["id"], "quality": res.get("quality", "ok"), **({"error": err} if err else {})})
         plate = plate or res.get("plate")
         structural = structural or bool(res.get("structural"))
-        for d in res.get("parts", []):
-            part = d.get("part")
-            if part not in PARTS:
+        unmapped = []
+        for d in res.get("parts") or []:
+            if not isinstance(d, dict):
                 continue
-            key = (part, d.get("side", PARTS[part]["zone"]))
+            part = _part_key(d.get("part"), d.get("side"))
+            if not part:
+                unmapped.append(str(d.get("part")))
+                continue
+            key = (part, d.get("side") or PARTS[part]["zone"])
             cur = merged.get(key)
-            conf = float(d.get("confidence", 0.5))
+            try:
+                conf = float(d.get("confidence", 0.5))
+            except (TypeError, ValueError):
+                conf = 0.5
             if not cur:
                 merged[key] = {"part": part, "side": key[1], "severity": d.get("severity", "moderate"),
                                "action": d.get("action", "replace"), "material": PARTS[part]["material"],
@@ -172,9 +220,13 @@ def damage(state: ClaimState):
             else:
                 cur["photo_ids"].append(ph["id"])
                 cur["confidence"] = max(cur["confidence"], conf)
-        emit(cid, "message", "damage",
-             f"{ph['id']}: " + (", ".join(f"{d.get('part')} ({d.get('side')}, {d.get('severity')})" for d in res.get("parts", [])) or "no damage found"),
-             {"photo": ph["id"], "parts": res.get("parts", []), "quality": res.get("quality")})
+        if err:
+            continue
+        text = ", ".join(f"{d.get('part')} ({d.get('side')}, {d.get('severity')})" for d in res.get("parts") or [] if isinstance(d, dict))
+        if unmapped:
+            text += f" [not in parts list, ignored: {', '.join(unmapped)}]"
+        emit(cid, "message", "damage", f"{ph['id']}: " + (text or "no damage found"),
+             {"photo": ph["id"], "parts": res.get("parts", []), "quality": res.get("quality"), "unmapped": unmapped})
 
     damages = list(merged.values())
     return {"damages": damages, "plate_read": plate, "photo_quality": quality,
@@ -307,14 +359,18 @@ def auditor(state: ClaimState):
         add("A1 policy period", False, f"Accident {acc} is outside policy period {start}–{end}.", "escalate")
     else:
         add("A1 policy period", True, "Accident date within policy period.")
+    no_exif = []
     for ph in state.get("photos", []):
         pd = _d(ph.get("exif_datetime"))
         if not pd:
-            add(f"A1 photo date {ph['id']}", True, "No EXIF date (screenshot/forwarded image?) - noted.", "warn")
+            no_exif.append(ph["id"])
         elif start and end and not (start <= pd <= end):
             add(f"A1 photo date {ph['id']}", False, f"Photo taken {pd}, outside policy period.", "escalate")
         elif acc and abs((pd - acc).days) > 3:
             add(f"A1 photo date {ph['id']}", False, f"Photo taken {pd}, {abs((pd - acc).days)} days from accident.", "escalate")
+
+    if no_exif:
+        add("A1 photo date", True, f"No EXIF capture date on {_ids(no_exif)} (screenshot/forwarded image?) - noted.", "warn")
 
     # A2 duplicates
     dups = [p for p in state.get("photos", []) if p.get("duplicate_of")]
@@ -339,9 +395,11 @@ def auditor(state: ClaimState):
         sc = chat_json(STORY_SYSTEM, json.dumps({"story": state.get("story"), "damage": [
             {"part": d["part"], "side": d["side"]} for d in damages]}), models=config.TEXT_MODELS, mock=mock_val)
     except LLMError as e:
-        sc = {"consistent": True, "detail": f"Story check unavailable ({e})"}
+        sc = {"consistent": True, "detail": f"Story check unavailable ({e})", "unavailable": True}
     if not sc.get("consistent", True):
         add("A4 story vs photos", False, sc.get("detail", "Story contradicts damage location."), "send_back", "damage")
+    elif sc.get("unavailable"):
+        add("A4 story vs photos", True, sc["detail"] + " - not verified.", "warn")
     else:
         add("A4 story vs photos", True, sc.get("detail", "Story matches damage."))
 
@@ -356,12 +414,18 @@ def auditor(state: ClaimState):
 
     # A6 confidence / severity / CTL
     low = [d for d in damages if d["confidence"] < config.LOW_CONFIDENCE]
-    blurry = [q["photo"] for q in state.get("photo_quality") or [] if q["quality"] != "ok"]
-    if not damages:
+    pq = state.get("photo_quality") or []
+    failed = [q for q in pq if q.get("error")]
+    blurry = [q["photo"] for q in pq if q["quality"] != "ok" and not q.get("error")]
+    if failed:
+        # a vision outage is not evidence about the photos - say what actually happened
+        add("A6 assessment", False, f"Damage assessment failed for {_ids([q['photo'] for q in failed])} "
+            f"(vision model error: {failed[0]['error'][:160]}). A surveyor must inspect, or fix the model setup and resubmit.", "escalate")
+    if not damages and not failed:
         add("A6 confidence", False, "No damage detected in any photo - need clearer photos.", "escalate")
     elif low or blurry:
         add("A6 confidence", False, f"Low confidence on {', '.join(d['part'] for d in low) or 'photos ' + ', '.join(blurry)}. Clearer photo needed.", "escalate")
-    else:
+    elif not failed:
         add("A6 confidence", True, "All detections above confidence threshold.")
     idv = float(pol.get("idv") or 0)
     gross_hi = (est.get("totals") or {}).get("gross_high", 0)
@@ -385,6 +449,10 @@ def auditor(state: ClaimState):
     return {"audit": audit, "_summary": f"Audit {audit['status'].upper()} ({sum(not x['ok'] for x in f)} issue(s))"}
 
 
+def _ids(ids: list[str]) -> str:
+    return ids[0] if len(ids) == 1 else ", ".join(ids[:-1]) + " and " + ids[-1]
+
+
 def _collapse(f: list[dict]) -> list[dict]:
     """One row per check code (A1..A6): failing details win, warnings shown as ok=None."""
     out = []
@@ -397,7 +465,7 @@ def _collapse(f: list[dict]) -> list[dict]:
         pick = bad or warn or rows
         out.append({"check": code, "name": rows[0]["check"][3:],
                     "ok": False if bad else (None if warn else True),
-                    "detail": " ".join(x["detail"] for x in pick),
+                    "detail": " ".join(dict.fromkeys(x["detail"] for x in pick)),
                     "severity": pick[0]["severity"], "send_back_to": pick[0].get("send_back_to")})
     return out
 
