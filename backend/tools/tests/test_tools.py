@@ -42,6 +42,7 @@ def test_absent_and_invalid_capture_date(tmp_path):
 
 def test_hash_threshold_and_nearest(tmp_path, monkeypatch):
     path = tmp_path/'index.json'; monkeypatch.setattr(forensics,'HASH_INDEX',path)
+    monkeypatch.setattr(forensics,'RUNTIME_INDEX',tmp_path/'missing.json')
     path.write_text(json.dumps([{'claim_id':'near','phash':'000000000000003f'}, {'claim_id':'exact','phash':'0000000000000000'}]))
     assert forensics.find_duplicate('0000000000000000') == 'exact'
     path.write_text(json.dumps([{'claim_id':'six','phash':'000000000000003f'}]))
@@ -50,6 +51,15 @@ def test_hash_threshold_and_nearest(tmp_path, monkeypatch):
     path.write_text('[]'); assert forensics.find_duplicate('0000000000000000') is None
     path.write_text('broken')
     with pytest.raises(json.JSONDecodeError): forensics.find_duplicate('0000000000000000')
+
+def test_remember_uses_runtime_index_only(tmp_path, monkeypatch):
+    fixture, runtime = tmp_path/'fixture.json', tmp_path/'out'/'runtime.json'
+    fixture.write_text('[]')
+    monkeypatch.setattr(forensics,'HASH_INDEX',fixture); monkeypatch.setattr(forensics,'RUNTIME_INDEX',runtime)
+    forensics.remember('CLM-1','00000000000000ff'); forensics.remember('CLM-1','00000000000000ff')
+    assert fixture.read_text() == '[]'
+    assert json.loads(runtime.read_text()) == [{'claim_id':'CLM-1','phash':'00000000000000ff'}]
+    assert forensics.find_duplicate('00000000000000ff') == 'CLM-1'
 
 @pytest.mark.parametrize('bad', ['', 'bad', 'g'*16, 'a'*15, None])
 def test_reject_invalid_hash(bad):

@@ -12,6 +12,8 @@ import imagehash
 from PIL import Image, ImageOps
 
 HASH_INDEX = Path(__file__).resolve().parents[2] / "data/past_claims_hashes.json"
+# Completed live claims go to a gitignored runtime index, never into the committed fixture.
+RUNTIME_INDEX = Path(__file__).resolve().parents[2] / "outputs/claim_hashes.json"
 
 
 def _read_photo(path: str) -> dict:
@@ -46,6 +48,8 @@ def find_duplicate(phash: str, max_distance: int = 6) -> str | None:
     if type(max_distance) is not int or not 0 <= max_distance <= 64:
         raise ValueError("max_distance must be an integer from 0 to 64")
     records = json.loads(HASH_INDEX.read_text())
+    if RUNTIME_INDEX.exists():
+        records += json.loads(RUNTIME_INDEX.read_text())
     nearest = sorted((query - _hash(row["phash"]), row["claim_id"]) for row in records)
     return nearest[0][1] if nearest and nearest[0][0] <= max_distance else None
 
@@ -60,10 +64,11 @@ def inspect_photo(path: str, claim_id: str | None = None) -> dict:
 
 def remember(claim_id: str, phash: str, photo: str | None = None) -> None:
     """Index a COMPLETED claim's photo so future claims can be checked against it."""
-    records = json.loads(HASH_INDEX.read_text()) if HASH_INDEX.exists() else []
+    records = json.loads(RUNTIME_INDEX.read_text()) if RUNTIME_INDEX.exists() else []
     if not any(r["phash"] == phash and r["claim_id"] == claim_id for r in records):
         records.append({"claim_id": claim_id, "phash": phash})
-        HASH_INDEX.write_text(json.dumps(records, indent=2))
+        RUNTIME_INDEX.parent.mkdir(parents=True, exist_ok=True)
+        RUNTIME_INDEX.write_text(json.dumps(records, indent=2))
 
 
 def check_photo_date(exif_datetime: str | None, accident_date: str, policy_start: str, policy_end: str) -> dict:
