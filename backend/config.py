@@ -29,7 +29,7 @@ FAST_MODELS = [m.strip() for m in os.getenv(
 LLM_MOCK = os.getenv("LLM_MOCK", "0") == "1"
 LLM_TIMEOUT = float(os.getenv("LLM_TIMEOUT", "180"))
 
-MAX_SEND_BACKS = int(os.getenv("MAX_SEND_BACKS", "1"))  # auditor send-backs before escalation
+MAX_SEND_BACKS = int(os.getenv("MAX_SEND_BACKS", "2"))  # auditor send-backs before escalation
 LOW_CONFIDENCE = 0.6
 
 for d in (CACHE_DIR, UPLOADS, OUTPUTS):

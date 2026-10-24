@@ -133,11 +133,18 @@ def build_pdf(state: dict, status: str) -> Path:
     return out
 
 
-def build_email(state: dict) -> str:
+def build_email(state: dict, escalation_reasons: list[str] | None = None) -> str:
     v, pol = state.get("vehicle") or {}, state.get("policy") or {}
     t = (state.get("estimate") or {}).get("totals") or {}
     parts = ", ".join(l["part_name"] for l in (state.get("estimate") or {}).get("lines", []))
     synthetic = "SYNTHETIC TEST FIXTURE - not a real claim.\n\n" if state.get("synthetic") else ""
+    estimate = (f"Estimated repair (pre-survey): {rs(t.get('gross_low'))} – {rs(t.get('gross_high'))}\n"
+                f"Estimated payable after depreciation and deductibles: {rs(t.get('payable_low'))} – {rs(t.get('payable_high'))}\n"
+                if "payable_low" in t else "Estimate: pending surveyor inspection\n")
+    flagged = ""
+    if escalation_reasons:
+        flagged = ("Automated pre-checks flagged the following for your surveyor's inspection:\n"
+                   + "".join(f"  - {r}\n" for r in escalation_reasons) + "\n")
     return redact(
         f"Subject: Own-damage claim intimation — Policy {mask(pol.get('policy_no'))} — Vehicle {mask(v.get('reg_no'))}\n\n"
         f"{synthetic}Dear Claims Team,\n\n"
@@ -145,8 +152,8 @@ def build_email(state: dict) -> str:
         f"Date of accident: {state.get('accident_date')}\n"
         f"What happened: {state.get('story')}\n"
         f"Damaged parts: {parts or 'see attached'}\n"
-        f"Estimated repair (pre-survey): {rs(t.get('gross_low'))} – {rs(t.get('gross_high'))}\n"
-        f"Estimated payable after depreciation and deductibles: {rs(t.get('payable_low'))} – {rs(t.get('payable_high'))}\n\n"
+        f"{estimate}\n"
+        f"{flagged}"
         f"Attached: claim file with photos, clause-wise estimate and pre-checks (ClaimMate ref {state['claim_id']}).\n"
         f"Please arrange a survey at the earliest. I can be reached on the registered mobile number.\n\n"
         f"Regards,\nPolicyholder\n\n"

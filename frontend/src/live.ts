@@ -14,7 +14,7 @@ export function applyEvent(state: LiveState, event: ClaimEvent): LiveState {
     next.phase = 'running';
   }
   if (event.type === 'interrupt') { next.phase = 'review'; next.statuses.human = 'review'; }
-  if (event.type === 'escalate') { next.phase = 'escalated'; next.statuses.auditor = 'failed'; }
+  if (event.type === 'escalate') { next.phase = 'escalated'; next.statuses.auditor = 'review'; }
   if (event.type === 'done') { next.phase = 'done'; next.statuses.finalize = 'complete'; }
   // Only the run-level error (data.status === 'error') ends the assessment; agent errors may be recovered.
   if (event.type === 'error') { next.statuses[event.agent] = 'failed'; if (isTerminalError(event)) next.phase = 'error'; }

@@ -99,8 +99,12 @@ def coordinator(state: ClaimState):
             elif nxt == "policy":
                 upd.update({"coverage": None})
             emit(cid, "send_back", "coordinator", why, {"to": nxt, "send_back_to": nxt, "retry": retries + 1, "retries": retries + 1})
-    elif not state.get("damages"):
+    elif state.get("damages") is None:
         nxt, why = "damage", "Need damage assessment from photos."
+    elif not state.get("damages"):
+        # assessed but nothing visible: don't loop back to the vision agent - let the Auditor decide (A6)
+        nxt, why = "auditor", "No damage detected in any photo. Auditor must decide whether clearer evidence is needed."
+        upd = {"coverage": [], "estimate": {"lines": [], "totals": {}}}
     elif state.get("coverage") is None:
         nxt, why = "policy", "Damage known. Need policy coverage per part."
     elif state.get("estimate") is None:
@@ -124,7 +128,8 @@ For each part give: part, side (front|rear|left|right), severity (minor|moderate
 action (repair|replace) - plastic lamps/glass that are cracked are 'replace'; small dents/scratches are 'repair',
 confidence (0-1), evidence (max 12 words).
 Also give: plate (registration number text if readable else null), quality (ok|blurry|not_a_car),
-structural (true if chassis/pillars/airbags/engine bay look damaged).
+structural: true ONLY if you can clearly SEE deformed A/B pillars, bent chassis rails, deployed airbags or a crushed engine bay / radiator support.
+A dented or crumpled bonnet, broken bumper, lamps or glass alone is NOT structural - set false if unsure.
 JSON: {{"parts":[...], "plate": null, "quality": "ok", "structural": false}}"""
 
 
@@ -345,8 +350,9 @@ def auditor(state: ClaimState):
     missing = [l["part_name"] for l in est.get("lines", []) if l.get("price_missing")]
     add("A5 evidence trail", not bad, "Every amount has a photo and a clause." if not bad else f"No evidence for: {', '.join(bad)}",
         "send_back" if bad else "info", "cost" if bad else None)
-    if missing:
-        add("A5 price source", True, f"No catalogue price for {', '.join(missing)} - garage quote needed.", "warn")
+    proxy = [l["part_name"] for l in est.get("lines", []) if l.get("action") == "replace" and l.get("part_price") and not l.get("price_verified")]
+    if missing or proxy:
+        add("A5 price source", True, f"No verified catalogue price for {', '.join(missing + proxy)} - proxy/reference price used; garage quote recommended.", "warn")
 
     # A6 confidence / severity / CTL
     low = [d for d in damages if d["confidence"] < config.LOW_CONFIDENCE]
@@ -359,8 +365,10 @@ def auditor(state: ClaimState):
         add("A6 confidence", True, "All detections above confidence threshold.")
     idv = float(pol.get("idv") or 0)
     gross_hi = (est.get("totals") or {}).get("gross_high", 0)
-    if (state.get("meta") or {}).get("structural") or (idv and gross_hi > 0.75 * idv):
-        add("A6 major damage", False, "Structural damage or repair > 75% IDV (possible total loss).", "escalate")
+    if (state.get("meta") or {}).get("structural"):
+        add("A6 structural damage", False, "Vision flagged possible structural damage (pillars / chassis / airbags / engine bay) - a surveyor must inspect.", "escalate")
+    if idv and gross_hi > 0.75 * idv:
+        add("A6 total-loss threshold", False, f"Repair estimate up to Rs {gross_hi:,.0f} exceeds 75% of IDV (Rs {idv:,.0f}) - possible constructive total loss (IDV.CTL).", "escalate")
 
     # verdict (raw findings)
     esc = [x for x in f if not x["ok"] and x["severity"] == "escalate"]
@@ -436,9 +444,10 @@ def escalate(state: ClaimState):
     from backend.tools import claim_file
     audit = state.get("audit") or {}
     reasons = [x["detail"] for x in audit.get("findings", []) if x["ok"] is False]
-    pdf = claim_file.build_pdf(state, status="ESCALATED TO HUMAN SURVEYOR")
-    emit(state["claim_id"], "escalate", "auditor", "Handed to a human surveyor: " + "; ".join(reasons[:2]),
-         {"reasons": reasons})
-    return {"escalation": {"reasons": reasons or [audit.get("hint", "Auditor escalation")]},
-            "outputs": {"pdf_path": str(pdf)},
+    reasons = reasons or [audit.get("hint") or "Auditor escalation"]
+    pdf = claim_file.build_pdf({**state, "escalation": {"reasons": reasons}}, status="ESCALATED TO HUMAN SURVEYOR")
+    email = claim_file.build_email(state, escalation_reasons=reasons)
+    emit(state["claim_id"], "message", "auditor", "Surveyor hand-off file and email prepared.", {"reasons": reasons})
+    return {"escalation": {"reasons": reasons},
+            "outputs": {"pdf_path": str(pdf), "email_text": email, "handoff": True},
             "_summary": "Handed to human surveyor: " + "; ".join(reasons[:2])}

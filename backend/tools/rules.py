@@ -69,7 +69,27 @@ def _prices() -> dict:
 
 
 def part_price(model: str, part: str) -> dict | None:
-    return _prices().get(((model or "").lower(), part))
+    """Catalogue price; falls back (flagged unverified) so a replaced part is never priced at Rs 0.
+
+    1) exact model+part  2) same part, other side (headlamp_left -> headlamp)
+    3) same part, another model (flagged)  4) parts.json reference estimate (flagged)
+    """
+    m = (model or "").lower()
+    prices = _prices()
+    if (m, part) in prices:
+        return {**prices[(m, part)], "basis": "catalogue"}
+    base = part.replace("_left", "").replace("_right", "")
+    for key in ((m, base), (m, base + "_right"), (m, base + "_left")):
+        if key in prices:
+            return {**prices[key], "basis": f"catalogue ({key[1]} used as proxy)"}
+    for (om, op), row in prices.items():
+        if op in (part, base):
+            return {**row, "verified": False, "basis": f"catalogue price for {om.title()} used as proxy"}
+    ref = parts_catalog().get(part, {}).get("ref_price") or parts_catalog().get(base, {}).get("ref_price")
+    if ref:
+        return {"price": int(ref), "source_url": None, "checked_on": "", "verified": False,
+                "basis": "reference estimate (no catalogue row) - garage quote needed"}
+    return None
 
 
 @lru_cache(maxsize=1)
@@ -89,7 +109,8 @@ def labour_range(part: str, action: str) -> tuple[int, int]:
 
 
 def paint_range(part: str) -> tuple[int, int]:
-    p = _labour_json().get(part, {}).get("paint") or parts_catalog().get(part, {}).get("paint")
+    # authorised-workshop paint ranges from parts.json win; labour.json as fallback
+    p = parts_catalog().get(part, {}).get("paint") or _labour_json().get(part, {}).get("paint")
     return (int(p[0]), int(p[1])) if p else (0, 0)
 
 
@@ -128,7 +149,8 @@ def estimate_line(*, model: str, part: str, action: str, material: str, vehicle_
         "gross_low": gross_lo, "gross_high": gross_hi,
         "coverage_factor": factor,
         "paint": pnt_lo,
-        "note": (f"Catalogue price{'' if price and price['verified'] else ' (UNVERIFIED)'}; labour/paint are assumed ranges."
+        "price_basis": price.get("basis") if price else None,
+        "note": (f"Part price: {price.get('basis', 'catalogue')}{'' if price['verified'] else ' (UNVERIFIED)'}; labour/paint are assumed ranges."
                  if price else ("Repair: labour + paint only." if action == "repair" else "No catalogue price - garage quote needed.")),
         "payable_low": round(pay_lo * factor), "payable_high": round(pay_hi * factor),
     }

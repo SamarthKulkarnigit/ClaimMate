@@ -14,6 +14,7 @@ export interface ClaimState {
   estimate?: { lines: EstimateLine[]; totals: { gross_low: number; gross_high: number; depreciation: number; deductible: number; payable_low: number; payable_high: number } };
   audit?: { status: 'pass' | 'fail' | 'escalate'; findings: Finding[] };
   retries?: number; next?: string; decision?: 'approved' | 'rejected' | null;
-  outputs?: { pdf_path?: string; email_text?: string; insurer_ref?: string }; synthetic?: boolean;
+  escalation?: { reasons: string[] } | null;
+  outputs?: { pdf_path?: string; email_text?: string; insurer_ref?: string; handoff?: boolean }; synthetic?: boolean;
 }
 export interface Demo { name: string; title: string; description: string }

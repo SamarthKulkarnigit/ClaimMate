@@ -64,10 +64,10 @@ Real Ollama inference has not been exercised here (no API key).
 
 ### Open items for Role A
 
-1. **Zero-damage loop**: `backend/agents/nodes.py` `coordinator()` tests `not state.get("damages")`. When the Damage Assessor returns `[]` (no parts found, or the vision-failure fallback), it re-routes to `damage` until the recursion limit, and the claim ends in `error` instead of reaching Auditor A6. Fix: `elif state.get("damages") is None:`. Reproduce by uploading any photo with `LLM_MOCK=1`.
-2. **Send-back limit**: `MAX_SEND_BACKS` defaults to `1` in `backend/config.py` and `.env.example`. PLAN §3 and the UI ("Re-checks n / 2") expect 2. The mismatch demo currently shows one re-check before escalation.
-3. `data/policy/clauses.json`: explanatory glosses were moved from `text` (shown as the policy excerpt) to `note`. Their keywords were copied into `tags`. Demo-story retrieval is unchanged. Part queries keep the same top two clauses; only the weak third match changed (`S1.EXCL.a` → `GE.1`). Consider indexing `note` in `rag/search.py`.
-4. Optional: once `MAX_SEND_BACKS` is settled, expose it in `/api/health` so the UI does not hard-code the denominator.
+Resolved on `main` by Role A: the zero-damage loop (an empty damage list now goes to the Auditor and escalates via A6) and `MAX_SEND_BACKS` (now 2; the mismatch demo shows 2 / 2 re-checks). Escalations also produce a surveyor hand-off PDF and email; the merged email keeps the masking, synthetic label and DRAFT footer.
+
+1. `data/policy/clauses.json`: explanatory glosses were moved from `text` (shown as the policy excerpt) to `note`. Their keywords were copied into `tags`. Demo-story retrieval is unchanged. Part queries keep the same top two clauses; only the weak third match changed (`S1.EXCL.a` → `GE.1`). Consider indexing `note` in `rag/search.py`.
+2. Optional: expose `MAX_SEND_BACKS` in `/api/health` so the UI does not hard-code the denominator.
 
 ### Still blocked
 
@@ -75,3 +75,5 @@ Real Ollama inference has not been exercised here (no API key).
 - Real damage photos and the presentation deck. Run the ten claims through real agents after real photos arrive, and report model agreement separately from mock-mode and unit-test results.
 
 Validation: `pytest backend` covers depreciation boundaries, paint material, invalid inputs, EXIF, pHash thresholds and the runtime index, date checks, catalogue provenance, fixture isolation, PDF text, masking and pagination, and the live claim file's escaping and labelling.
+
+Note: `data/past_claims_hashes.json` on `main` includes `CLM-EA71F41C`, which the old `remember()` recorded from a live test upload. It is kept so re-uploading that photo still demonstrates A2. New live claims go to `outputs/claim_hashes.json`.

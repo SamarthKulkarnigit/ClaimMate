@@ -56,3 +56,12 @@ def test_email_is_masked_labelled_draft():
     assert email.startswith('Subject:') and 'SYNTHETIC TEST FIXTURE' in email
     assert 'DRAFT ONLY - not sent' in email and 'Rs 4,049' in email
     assert 'SYNTHETIC' not in claim_file.build_email(state(synthetic=False))
+
+
+def test_escalation_email_lists_reasons_and_stays_a_masked_draft():
+    email = claim_file.build_email(state(), escalation_reasons=['Plate TEST000000 differs from RC'])
+    assert "flagged the following for your surveyor's inspection" in email
+    assert 'TEST000000' not in email and 'DRAFT ONLY - not sent' in email
+    no_totals = state(estimate={'lines': [], 'totals': {}})
+    pending = claim_file.build_email(no_totals, escalation_reasons=['No damage detected'])
+    assert 'Rs 0' not in pending and 'pending surveyor inspection' in pending
