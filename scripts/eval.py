@@ -22,16 +22,10 @@ DEMO = config.DATA / "demo_claims"
 
 
 def run(name: str) -> dict:
-    c = json.loads((DEMO / name / "claim.json").read_text(encoding="utf-8"))
-    photos = [{"id": f"P{i}", "path": str(DEMO / name / fn), "name": fn} for i, fn in enumerate(c["photos"], 1)]
-    mock = c.get("mock", {})
-    for k in ("damage", "damage_recheck"):
-        if isinstance(mock.get(k), dict):
-            mock[k] = {p["id"]: mock[k].get(p["name"]) for p in photos}
+    from backend.app.demo_loader import load_demo
     cid = f"EVAL-{name}-{int(time.time())}"
     cfg = {"configurable": {"thread_id": cid}, "recursion_limit": 60}
-    state = {"claim_id": cid, "story": c["story"], "accident_date": c["accident_date"], "vehicle": c["vehicle"],
-             "policy": c["policy"], "photos": photos, "mock": mock, "retries": 0, "trail": [], "meta": {"demo": name}}
+    state = load_demo(name, cid, copy_photos=False)
     t0 = time.time()
     GRAPH.invoke(state, cfg)
     snap = GRAPH.get_state(cfg)
@@ -40,14 +34,16 @@ def run(name: str) -> dict:
     v = GRAPH.get_state(cfg).values
     secs = time.time() - t0
 
-    exp = c.get("expected", {})
+    exp = state["meta"]["expected"] or {}
     outcome = "escalate" if v.get("escalation") else (v.get("audit") or {}).get("status")
     covered = {x["part"] for x in v.get("coverage") or [] if x["status"] in ("covered", "partial")}
     not_cov = {(x.get("item") or "").lower() for x in v.get("extra_items") or [] if x["status"] == "not_covered"}
     checks = {"outcome": outcome == exp.get("audit")}
     if exp.get("audit") != "escalate":
         checks["covered_parts"] = set(exp.get("covered", [])) <= covered
-        checks["exclusions"] = all(any(e.lower().split()[0] in n for n in not_cov) for e in exp.get("not_covered", []))
+        checks["exclusions"] = all(any(e.lower().replace("_", " ").split()[0] in n for n in not_cov) for e in exp.get("not_covered", []))
+        lines = {l["part"]: l for l in (v.get("estimate") or {}).get("lines", [])}
+        checks["depreciation"] = all(abs(lines.get(pt, {}).get("dep_pct", -1) - pct) < 1e-6 for pt, pct in (exp.get("dep_pct") or {}).items())
     t = (v.get("estimate") or {}).get("totals") or {}
     return {"name": name, "outcome": outcome, "expected": exp.get("audit"), "checks": checks,
             "pass": all(checks.values()), "secs": round(secs, 1),

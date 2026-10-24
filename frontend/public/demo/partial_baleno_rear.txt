@@ -1,0 +1,23 @@
+Subject: Motor own damage claim review - DEMO-002
+
+SYNTHETIC TEST FIXTURE - not a real claim.
+
+Dear Claims Team,
+
+Please review the attached claim assessment and supporting evidence.
+Vehicle: Maruti Suzuki Baleno / ****0000
+Policy: ************0001
+Accident date: 2026-10-23
+Incident: A low-speed rear impact damaged my bumper and left tail lamp. I also reported engine noise.
+Estimated payable: INR 4,249.50 - 4,849.50 (estimate)
+Audit: pass
+Review decision: approved
+
+The range uses source-linked parts prices and assumed labour rates. Coverage,
+fitment, add-ons and the final settlement remain subject to insurer verification.
+Please advise on the required documents and surveyor appointment, if applicable.
+
+Regards,
+Policyholder
+
+DRAFT ONLY - not sent. Full identifiers should be supplied through the insurer's secure channel.

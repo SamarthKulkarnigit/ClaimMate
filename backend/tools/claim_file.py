@@ -83,7 +83,8 @@ def build_pdf(state: dict, status: str) -> Path:
         el.append(Spacer(1, 3 * mm))
         el.append(Paragraph(f"Auditor checks — {audit.get('status', '').upper()}", ss["Heading3"]))
         for x in audit["findings"]:
-            el.append(Paragraph(f"{'PASS' if x['ok'] else 'FLAG'} · {x['check']}: {x['detail']}", small))
+            tag = "PASS" if x["ok"] else ("NOTE" if x["ok"] is None else "FLAG")
+            el.append(Paragraph(f"{tag} · {x['check']} {x.get('name', '')}: {x['detail']}", small))
 
     if state.get("escalation"):
         el.append(Spacer(1, 3 * mm))

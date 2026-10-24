@@ -72,14 +72,24 @@ def part_price(model: str, part: str) -> dict | None:
     return _prices().get(((model or "").lower(), part))
 
 
+@lru_cache(maxsize=1)
+def _labour_json() -> dict:
+    f = config.DATA / "labour.json"
+    return json.loads(f.read_text(encoding="utf-8")) if f.exists() else {}
+
+
 def labour_range(part: str, action: str) -> tuple[int, int]:
+    lj = _labour_json().get(part, {})
+    rng = lj.get("repair" if action == "repair" else "replace") or lj.get("replace")
+    if rng:
+        return int(rng[0]), int(rng[1])
     p = parts_catalog().get(part, {})
     rng = p.get("repair" if action == "repair" else "replace_labour") or p.get("replace_labour") or [0, 0]
     return int(rng[0]), int(rng[1])
 
 
 def paint_range(part: str) -> tuple[int, int]:
-    p = parts_catalog().get(part, {}).get("paint")
+    p = _labour_json().get(part, {}).get("paint") or parts_catalog().get(part, {}).get("paint")
     return (int(p[0]), int(p[1])) if p else (0, 0)
 
 
@@ -117,6 +127,9 @@ def estimate_line(*, model: str, part: str, action: str, material: str, vehicle_
         "paint_dep_low": paint_dep_lo, "paint_dep_high": paint_dep_hi,
         "gross_low": gross_lo, "gross_high": gross_hi,
         "coverage_factor": factor,
+        "paint": pnt_lo,
+        "note": (f"Catalogue price{'' if price and price['verified'] else ' (UNVERIFIED)'}; labour/paint are assumed ranges."
+                 if price else ("Repair: labour + paint only." if action == "repair" else "No catalogue price - garage quote needed.")),
         "payable_low": round(pay_lo * factor), "payable_high": round(pay_hi * factor),
     }
 
@@ -133,4 +146,6 @@ def totals(lines: list[dict], cc: int, voluntary_deductible: int = 0) -> dict:
         "compulsory_deductible": compulsory_deductible(cc),
         "voluntary_deductible": int(voluntary_deductible or 0),
         "payable_low": max(0, pay_lo - ded), "payable_high": max(0, pay_hi - ded),
+        "depreciation": sum(l["dep_amount"] + l["paint_dep_low"] for l in lines),
+        "deductible": ded,
     }

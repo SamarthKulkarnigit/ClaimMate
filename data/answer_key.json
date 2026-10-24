@@ -1,0 +1,170 @@
+{
+  "clean_swift_front": {
+    "covered_parts": [
+      "front_bumper",
+      "headlamp"
+    ],
+    "not_covered_parts": [],
+    "expected_audit_outcome": "pass",
+    "expected_failed_checks": [],
+    "expected_retries": 0,
+    "expected_dep_pct": {
+      "front_bumper": 0.5,
+      "headlamp": 0.5
+    },
+    "synthetic": true,
+    "evaluation_note": "Expected labels for a controlled fixture; not measured model accuracy."
+  },
+  "partial_baleno_rear": {
+    "covered_parts": [
+      "rear_bumper",
+      "tail_lamp"
+    ],
+    "not_covered_parts": [
+      "engine_noise"
+    ],
+    "expected_audit_outcome": "pass",
+    "expected_failed_checks": [],
+    "expected_retries": 0,
+    "expected_dep_pct": {
+      "rear_bumper": 0.5,
+      "tail_lamp": 0.5
+    },
+    "synthetic": true,
+    "evaluation_note": "Expected labels for a controlled fixture; not measured model accuracy."
+  },
+  "mismatch_front_rear": {
+    "covered_parts": [
+      "front_bumper",
+      "headlamp"
+    ],
+    "not_covered_parts": [],
+    "expected_audit_outcome": "escalate",
+    "expected_failed_checks": [
+      "A4"
+    ],
+    "expected_retries": 2,
+    "expected_dep_pct": {
+      "front_bumper": 0.5,
+      "headlamp": 0.5
+    },
+    "synthetic": true,
+    "evaluation_note": "Expected labels for a controlled fixture; not measured model accuracy."
+  },
+  "duplicate_photo": {
+    "covered_parts": [
+      "front_bumper",
+      "headlamp"
+    ],
+    "not_covered_parts": [],
+    "expected_audit_outcome": "escalate",
+    "expected_failed_checks": [
+      "A2"
+    ],
+    "expected_retries": 0,
+    "expected_dep_pct": {
+      "front_bumper": 0.5,
+      "headlamp": 0.5
+    },
+    "synthetic": true,
+    "evaluation_note": "Expected labels for a controlled fixture; not measured model accuracy."
+  },
+  "exif_before_policy": {
+    "covered_parts": [
+      "front_bumper",
+      "headlamp"
+    ],
+    "not_covered_parts": [],
+    "expected_audit_outcome": "escalate",
+    "expected_failed_checks": [
+      "A1"
+    ],
+    "expected_retries": 0,
+    "expected_dep_pct": {
+      "front_bumper": 0.5,
+      "headlamp": 0.5
+    },
+    "synthetic": true,
+    "evaluation_note": "Expected labels for a controlled fixture; not measured model accuracy."
+  },
+  "plate_mismatch": {
+    "covered_parts": [
+      "front_bumper",
+      "headlamp"
+    ],
+    "not_covered_parts": [],
+    "expected_audit_outcome": "escalate",
+    "expected_failed_checks": [
+      "A3"
+    ],
+    "expected_retries": 1,
+    "expected_dep_pct": {
+      "front_bumper": 0.5,
+      "headlamp": 0.5
+    },
+    "synthetic": true,
+    "evaluation_note": "Expected labels for a controlled fixture; not measured model accuracy."
+  },
+  "blurry_photo": {
+    "covered_parts": [
+      "front_bumper",
+      "headlamp"
+    ],
+    "not_covered_parts": [],
+    "expected_audit_outcome": "escalate",
+    "expected_failed_checks": [
+      "A6"
+    ],
+    "expected_retries": 0,
+    "expected_dep_pct": {
+      "front_bumper": 0.5,
+      "headlamp": 0.5
+    },
+    "synthetic": true,
+    "evaluation_note": "Expected labels for a controlled fixture; not measured model accuracy."
+  },
+  "zero_dep": {
+    "covered_parts": [
+      "front_bumper",
+      "headlamp"
+    ],
+    "not_covered_parts": [],
+    "expected_audit_outcome": "pass",
+    "expected_failed_checks": [],
+    "expected_retries": 0,
+    "expected_dep_pct": {
+      "front_bumper": 0.0,
+      "headlamp": 0.0
+    },
+    "synthetic": true,
+    "evaluation_note": "Expected labels for a controlled fixture; not measured model accuracy."
+  },
+  "six_year_old": {
+    "covered_parts": [
+      "front_fender_right"
+    ],
+    "not_covered_parts": [],
+    "expected_audit_outcome": "pass",
+    "expected_failed_checks": [],
+    "expected_retries": 0,
+    "expected_dep_pct": {
+      "front_fender_right": 0.4
+    },
+    "synthetic": true,
+    "evaluation_note": "Expected labels for a controlled fixture; not measured model accuracy."
+  },
+  "windshield_only": {
+    "covered_parts": [
+      "windshield"
+    ],
+    "not_covered_parts": [],
+    "expected_audit_outcome": "pass",
+    "expected_failed_checks": [],
+    "expected_retries": 0,
+    "expected_dep_pct": {
+      "windshield": 0.0
+    },
+    "synthetic": true,
+    "evaluation_note": "Expected labels for a controlled fixture; not measured model accuracy."
+  }
+}

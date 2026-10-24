@@ -25,5 +25,6 @@ class ClaimState(TypedDict, total=False):
     decision: str | None
     escalation: dict | None
     outputs: dict
+    synthetic: bool
     mock: dict             # demo-only canned LLM answers (used when LLM_MOCK=1)
     meta: dict[str, Any]

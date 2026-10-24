@@ -1,0 +1,28 @@
+{
+ "damage": {
+  "*": {
+   "parts": [
+    {
+     "part": "front_fender_right",
+     "side": "right",
+     "severity": "moderate",
+     "action": "replace",
+     "confidence": 0.88,
+     "evidence": "scrape and dent on right fender"
+    }
+   ],
+   "plate": "TEST0000",
+   "quality": "ok"
+  }
+ },
+ "story_check": [
+  {
+   "story_zone": "right",
+   "damage_zones": [
+    "right"
+   ],
+   "consistent": true,
+   "detail": "Matches right-side scrape."
+  }
+ ]
+}

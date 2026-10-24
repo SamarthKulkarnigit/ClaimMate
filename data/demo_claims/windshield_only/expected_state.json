@@ -1,0 +1,124 @@
+{
+  "claim_id": "DEMO-010",
+  "synthetic": true,
+  "story": "A flying stone cracked my windshield.",
+  "accident_date": "2026-10-23",
+  "vehicle": {
+    "make": "Maruti Suzuki",
+    "model": "Swift",
+    "reg_no": "TEST0000",
+    "cc": 1197,
+    "reg_date": "2024-04-23",
+    "age_months": 30
+  },
+  "policy": {
+    "policy_no": "DEMO-POLICY-0001",
+    "start": "2026-01-01",
+    "end": "2026-12-31",
+    "idv": 500000,
+    "zero_dep": false,
+    "voluntary_deductible": 0,
+    "pdf_path": "data/policy/standard_od_policy.pdf"
+  },
+  "photos": [
+    {
+      "id": "photo-1",
+      "path": "data/demo_claims/windshield_only/photos/evidence.jpg",
+      "exif_datetime": "2026-10-23T10:30:00",
+      "has_exif": true,
+      "phash": "bd5347695a0d1956"
+    }
+  ],
+  "damages": [
+    {
+      "part": "windshield",
+      "side": "front",
+      "severity": "moderate",
+      "action": "replace",
+      "material": "glass",
+      "photo_ids": [
+        "photo-1"
+      ],
+      "confidence": 0.94
+    }
+  ],
+  "coverage": [
+    {
+      "part": "windshield",
+      "status": "covered",
+      "clause_id": "Section I(vi)",
+      "clause_quote": "by accidental external means;",
+      "reason": "Synthetic scenario assumes admissible accidental external damage."
+    }
+  ],
+  "estimate": {
+    "lines": [
+      {
+        "part": "windshield",
+        "action": "replace",
+        "part_price": 4100.0,
+        "part_source_url": "https://www.marutisuzuki.com/genuine-parts/swift/glass-and-windshield",
+        "labour_low": 700,
+        "labour_high": 1200,
+        "paint": 0,
+        "material": "glass",
+        "dep_pct": 0.0,
+        "dep_amount": 0.0,
+        "payable_low": 4800.0,
+        "payable_high": 5300.0,
+        "clause_id": "Section I(vi)",
+        "photo_ids": [
+          "photo-1"
+        ],
+        "note": "Labour is an assumption; painting excluded from this fixture. Swift 2017-2024 catalogue; confirm variant and VIN"
+      }
+    ],
+    "totals": {
+      "gross_low": 4800.0,
+      "gross_high": 5300.0,
+      "depreciation": 0.0,
+      "deductible": 1000,
+      "payable_low": 3800.0,
+      "payable_high": 4300.0
+    }
+  },
+  "audit": {
+    "status": "pass",
+    "findings": [
+      {
+        "check": "A1",
+        "ok": true,
+        "detail": "Capture date matches the accident date and policy period."
+      },
+      {
+        "check": "A2",
+        "ok": true,
+        "detail": "No matching image in the prior-claim fixture index."
+      },
+      {
+        "check": "A3",
+        "ok": true,
+        "detail": "Fixture plate matches the supplied vehicle record."
+      },
+      {
+        "check": "A4",
+        "ok": true,
+        "detail": "Incident location agrees with the fixture damage labels."
+      },
+      {
+        "check": "A5",
+        "ok": true,
+        "detail": "Each estimate line has evidence and a coverage decision."
+      },
+      {
+        "check": "A6",
+        "ok": true,
+        "detail": "Fixture confidence is above 0.6; no structural damage is specified."
+      }
+    ]
+  },
+  "plate_read": "TEST0000",
+  "retries": 0,
+  "next": "human",
+  "decision": null
+}

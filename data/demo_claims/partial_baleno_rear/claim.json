@@ -1,117 +1,32 @@
 {
-  "title": "Partial cover \u2014 Baleno rear hit + engine noise",
-  "story": "A bike hit the back of my car at a signal. Since then the engine also makes a rattling noise.",
-  "accident_date": "2026-10-18",
+  "claim_id": "DEMO-002",
+  "synthetic": true,
+  "story": "A low-speed rear impact damaged my bumper and left tail lamp. I also reported engine noise.",
+  "accident_date": "2026-10-23",
   "vehicle": {
     "make": "Maruti Suzuki",
-    "model": "baleno",
-    "reg_no": "KA05MN4521",
+    "model": "Baleno",
+    "reg_no": "TEST0000",
     "cc": 1197,
-    "reg_date": "2021-06-15"
+    "reg_date": "2024-04-23",
+    "age_months": 30
   },
   "policy": {
-    "policy_no": "OD/2026/551203",
-    "start": "2026-06-10",
-    "end": "2027-06-09",
-    "idv": 420000,
+    "policy_no": "DEMO-POLICY-0001",
+    "start": "2026-01-01",
+    "end": "2026-12-31",
+    "idv": 500000,
     "zero_dep": false,
-    "voluntary_deductible": 0
+    "voluntary_deductible": 0,
+    "pdf_path": "data/policy/standard_od_policy.pdf"
   },
   "photos": [
-    "rear1.jpg",
-    "rear2.jpg"
-  ],
-  "expected": {
-    "audit": "pass",
-    "covered": [
-      "rear_bumper",
-      "tail_lamp",
-      "boot_lid"
-    ],
-    "not_covered": [
-      "engine noise"
-    ]
-  },
-  "mock": {
-    "damage": {
-      "rear1.jpg": {
-        "parts": [
-          {
-            "part": "rear_bumper",
-            "side": "rear",
-            "severity": "moderate",
-            "action": "replace",
-            "confidence": 0.86,
-            "evidence": "bumper cracked and pushed in"
-          },
-          {
-            "part": "tail_lamp",
-            "side": "rear",
-            "severity": "severe",
-            "action": "replace",
-            "confidence": 0.9,
-            "evidence": "left tail lamp broken"
-          }
-        ],
-        "plate": "KA05MN4521",
-        "quality": "ok",
-        "structural": false
-      },
-      "rear2.jpg": {
-        "parts": [
-          {
-            "part": "boot_lid",
-            "side": "rear",
-            "severity": "moderate",
-            "action": "repair",
-            "confidence": 0.8,
-            "evidence": "dent on boot lid"
-          }
-        ],
-        "plate": null,
-        "quality": "ok",
-        "structural": false
-      }
-    },
-    "policy": {
-      "coverage": [
-        {
-          "part": "rear_bumper",
-          "status": "covered",
-          "clause_id": "S1.PERIL.vi",
-          "reason": "Damage from being hit by another vehicle is accidental external damage."
-        },
-        {
-          "part": "tail_lamp",
-          "status": "covered",
-          "clause_id": "S1.PERIL.vi",
-          "reason": "Broken in the same accident, so it is covered."
-        },
-        {
-          "part": "boot_lid",
-          "status": "covered",
-          "clause_id": "S1.PERIL.vi",
-          "reason": "Dent from the impact is covered."
-        }
-      ],
-      "extra_items": [
-        {
-          "item": "Engine rattling noise",
-          "status": "not_covered",
-          "clause_id": "S1.EXCL.a",
-          "reason": "Mechanical breakdown is excluded unless caused by the impact; a surveyor must inspect."
-        }
-      ]
-    },
-    "story_check": [
-      {
-        "story_zone": "rear",
-        "damage_zones": [
-          "rear"
-        ],
-        "consistent": true,
-        "detail": "Story (hit from behind) matches rear damage."
-      }
-    ]
-  }
+    {
+      "id": "photo-1",
+      "path": "data/demo_claims/partial_baleno_rear/photos/evidence.jpg",
+      "exif_datetime": "2026-10-23T10:30:00",
+      "has_exif": true,
+      "phash": "fd5a0265475d5946"
+    }
+  ]
 }

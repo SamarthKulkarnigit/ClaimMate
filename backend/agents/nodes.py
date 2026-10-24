@@ -11,6 +11,12 @@ from functools import wraps
 
 from langgraph.types import interrupt
 
+try:
+    from langgraph.errors import GraphInterrupt
+except ImportError:  # test stubs
+    class GraphInterrupt(Exception):
+        pass
+
 from backend import config
 from backend.app.events import emit
 from backend.llm.ollama_client import LLMError, chat_json
@@ -31,6 +37,8 @@ def agent(name: str):
             emit(cid, "agent_start", name, f"{name} started")
             try:
                 out = fn(state) or {}
+            except GraphInterrupt:
+                raise  # normal pause for human approval, not an error
             except Exception as e:  # noqa: BLE001
                 emit(cid, "error", name, f"{name} failed: {e}")
                 raise
@@ -90,7 +98,7 @@ def coordinator(state: ClaimState):
                 upd.update({"damages": None, "coverage": None})
             elif nxt == "policy":
                 upd.update({"coverage": None})
-            emit(cid, "send_back", "coordinator", why, {"to": nxt, "retry": retries + 1})
+            emit(cid, "send_back", "coordinator", why, {"to": nxt, "send_back_to": nxt, "retry": retries + 1, "retries": retries + 1})
     elif not state.get("damages"):
         nxt, why = "damage", "Need damage assessment from photos."
     elif state.get("coverage") is None:
@@ -354,7 +362,7 @@ def auditor(state: ClaimState):
     if (state.get("meta") or {}).get("structural") or (idv and gross_hi > 0.75 * idv):
         add("A6 major damage", False, "Structural damage or repair > 75% IDV (possible total loss).", "escalate")
 
-    # verdict
+    # verdict (raw findings)
     esc = [x for x in f if not x["ok"] and x["severity"] == "escalate"]
     sb = [x for x in f if not x["ok"] and x["severity"] == "send_back"]
     if esc:
@@ -364,15 +372,38 @@ def auditor(state: ClaimState):
                  "hint": f"{sb[0]['detail']} Owner's story: \"{state.get('story')}\""}
     else:
         audit = {"status": "pass", "findings": f}
+    audit["findings"] = _collapse(f)
+    audit["raw_findings"] = f
     return {"audit": audit, "_summary": f"Audit {audit['status'].upper()} ({sum(not x['ok'] for x in f)} issue(s))"}
 
 
+def _collapse(f: list[dict]) -> list[dict]:
+    """One row per check code (A1..A6): failing details win, warnings shown as ok=None."""
+    out = []
+    for code in ("A1", "A2", "A3", "A4", "A5", "A6"):
+        rows = [x for x in f if x["check"].startswith(code)]
+        if not rows:
+            continue
+        bad = [x for x in rows if not x["ok"]]
+        warn = [x for x in rows if x["ok"] and x["severity"] == "warn"]
+        pick = bad or warn or rows
+        out.append({"check": code, "name": rows[0]["check"][3:],
+                    "ok": False if bad else (None if warn else True),
+                    "detail": " ".join(x["detail"] for x in pick),
+                    "severity": pick[0]["severity"], "send_back_to": pick[0].get("send_back_to")})
+    return out
+
+
 # --------------------------------------------------------------------------- human-in-the-loop
+_ASKED: set[str] = set()
+
 @agent("human")
 def human(state: ClaimState):
     cid = state["claim_id"]
     t = (state.get("estimate") or {}).get("totals", {})
-    emit(cid, "interrupt", "human", "Waiting for owner approval", {"totals": t})
+    if cid not in _ASKED:
+        _ASKED.add(cid)
+        emit(cid, "interrupt", "human", "Waiting for owner approval", {"totals": t})
     answer = interrupt({"question": "Approve this claim for filing?", "totals": t})
     approved = bool((answer or {}).get("approved"))
     emit(cid, "message", "human", "Owner approved" if approved else "Owner rejected", answer or {})
@@ -404,8 +435,10 @@ def finalize(state: ClaimState):
 def escalate(state: ClaimState):
     from backend.tools import claim_file
     audit = state.get("audit") or {}
-    reasons = [x["detail"] for x in audit.get("findings", []) if not x["ok"]]
+    reasons = [x["detail"] for x in audit.get("findings", []) if x["ok"] is False]
     pdf = claim_file.build_pdf(state, status="ESCALATED TO HUMAN SURVEYOR")
+    emit(state["claim_id"], "escalate", "auditor", "Handed to a human surveyor: " + "; ".join(reasons[:2]),
+         {"reasons": reasons})
     return {"escalation": {"reasons": reasons or [audit.get("hint", "Auditor escalation")]},
             "outputs": {"pdf_path": str(pdf)},
             "_summary": "Handed to human surveyor: " + "; ".join(reasons[:2])}

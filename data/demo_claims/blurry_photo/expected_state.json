@@ -1,0 +1,161 @@
+{
+  "claim_id": "DEMO-007",
+  "synthetic": true,
+  "story": "Hit a pole while parking; front bumper and right headlamp were damaged.",
+  "accident_date": "2026-10-23",
+  "vehicle": {
+    "make": "Maruti Suzuki",
+    "model": "Swift",
+    "reg_no": "TEST0000",
+    "cc": 1197,
+    "reg_date": "2024-04-23",
+    "age_months": 30
+  },
+  "policy": {
+    "policy_no": "DEMO-POLICY-0001",
+    "start": "2026-01-01",
+    "end": "2026-12-31",
+    "idv": 500000,
+    "zero_dep": false,
+    "voluntary_deductible": 0,
+    "pdf_path": "data/policy/standard_od_policy.pdf"
+  },
+  "photos": [
+    {
+      "id": "photo-1",
+      "path": "data/demo_claims/blurry_photo/photos/evidence.jpg",
+      "exif_datetime": "2026-10-23T10:30:00",
+      "has_exif": true,
+      "phash": "f856176d52495d43"
+    }
+  ],
+  "damages": [
+    {
+      "part": "front_bumper",
+      "side": "front",
+      "severity": "moderate",
+      "action": "replace",
+      "material": "plastic",
+      "photo_ids": [
+        "photo-1"
+      ],
+      "confidence": 0.35
+    },
+    {
+      "part": "headlamp",
+      "side": "front",
+      "severity": "moderate",
+      "action": "replace",
+      "material": "plastic",
+      "photo_ids": [
+        "photo-1"
+      ],
+      "confidence": 0.35
+    }
+  ],
+  "coverage": [
+    {
+      "part": "front_bumper",
+      "status": "covered",
+      "clause_id": "Section I(vi)",
+      "clause_quote": "by accidental external means;",
+      "reason": "Synthetic scenario assumes admissible accidental external damage."
+    },
+    {
+      "part": "headlamp",
+      "status": "covered",
+      "clause_id": "Section I(vi)",
+      "clause_quote": "by accidental external means;",
+      "reason": "Synthetic scenario assumes admissible accidental external damage."
+    }
+  ],
+  "estimate": {
+    "lines": [
+      {
+        "part": "front_bumper",
+        "action": "replace",
+        "part_price": 2250.0,
+        "part_source_url": "https://www.marutisuzuki.com/genuine-parts/front-bumper/71711m55r00-5pk",
+        "labour_low": 600,
+        "labour_high": 1000,
+        "paint": 0,
+        "material": "plastic",
+        "dep_pct": 0.5,
+        "dep_amount": 1125.0,
+        "payable_low": 1725.0,
+        "payable_high": 2125.0,
+        "clause_id": "Section I(vi)",
+        "photo_ids": [
+          "photo-1"
+        ],
+        "note": "Labour is an assumption; painting excluded from this fixture. Swift 2017-2024; confirm variant and VIN"
+      },
+      {
+        "part": "headlamp",
+        "action": "replace",
+        "part_price": 2999.0,
+        "part_source_url": "https://www.marutisuzuki.com/genuine-parts/head-lamp-assembly-right/35100m55r10",
+        "labour_low": 250,
+        "labour_high": 450,
+        "paint": 0,
+        "material": "plastic",
+        "dep_pct": 0.5,
+        "dep_amount": 1499.5,
+        "payable_low": 1749.5,
+        "payable_high": 1949.5,
+        "clause_id": "Section I(vi)",
+        "photo_ids": [
+          "photo-1"
+        ],
+        "note": "Labour is an assumption; painting excluded from this fixture. Right halogen assembly; selected Swift 2017-2022 variants; confirm VIN"
+      }
+    ],
+    "totals": {
+      "gross_low": 6099.0,
+      "gross_high": 6699.0,
+      "depreciation": 2624.5,
+      "deductible": 1000,
+      "payable_low": 2474.5,
+      "payable_high": 3074.5
+    }
+  },
+  "audit": {
+    "status": "escalate",
+    "findings": [
+      {
+        "check": "A1",
+        "ok": true,
+        "detail": "Capture date matches the accident date and policy period."
+      },
+      {
+        "check": "A2",
+        "ok": true,
+        "detail": "No matching image in the prior-claim fixture index."
+      },
+      {
+        "check": "A3",
+        "ok": true,
+        "detail": "Fixture plate matches the supplied vehicle record."
+      },
+      {
+        "check": "A4",
+        "ok": true,
+        "detail": "Incident location agrees with the fixture damage labels."
+      },
+      {
+        "check": "A5",
+        "ok": true,
+        "detail": "Each estimate line has evidence and a coverage decision."
+      },
+      {
+        "check": "A6",
+        "ok": false,
+        "detail": "Evidence is blurred; confidence 0.35. Request clearer photos and refer to a surveyor."
+      }
+    ]
+  },
+  "plate_read": "TEST0000",
+  "retries": 0,
+  "next": "surveyor",
+  "decision": null
+}

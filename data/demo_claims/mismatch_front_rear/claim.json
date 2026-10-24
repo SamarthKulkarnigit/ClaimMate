@@ -1,89 +1,32 @@
 {
-  "title": "Story contradicts photos \u2014 rear-ended but front damaged",
-  "story": "I was waiting at a red light and a truck rear-ended my car.",
-  "accident_date": "2026-10-21",
+  "claim_id": "DEMO-003",
+  "synthetic": true,
+  "story": "I was rear-ended while stopped at a traffic signal.",
+  "accident_date": "2026-10-23",
   "vehicle": {
     "make": "Maruti Suzuki",
-    "model": "swift",
-    "reg_no": "KA01AB1234",
+    "model": "Swift",
+    "reg_no": "TEST0000",
     "cc": 1197,
-    "reg_date": "2024-03-10"
+    "reg_date": "2024-04-23",
+    "age_months": 30
   },
   "policy": {
-    "policy_no": "OD/2026/778812",
-    "start": "2026-03-01",
-    "end": "2027-02-28",
-    "idv": 550000,
+    "policy_no": "DEMO-POLICY-0001",
+    "start": "2026-01-01",
+    "end": "2026-12-31",
+    "idv": 500000,
     "zero_dep": false,
-    "voluntary_deductible": 0
+    "voluntary_deductible": 0,
+    "pdf_path": "data/policy/standard_od_policy.pdf"
   },
   "photos": [
-    "front3.jpg",
-    "front4.jpg"
-  ],
-  "expected": {
-    "audit": "escalate",
-    "covered": [],
-    "not_covered": []
-  },
-  "mock": {
-    "damage": {
-      "front3.jpg": {
-        "parts": [
-          {
-            "part": "front_bumper",
-            "side": "front",
-            "severity": "severe",
-            "action": "replace",
-            "confidence": 0.9,
-            "evidence": "front bumper crushed"
-          },
-          {
-            "part": "grille",
-            "side": "front",
-            "severity": "moderate",
-            "action": "replace",
-            "confidence": 0.82,
-            "evidence": "grille broken"
-          }
-        ],
-        "plate": "KA01AB1234",
-        "quality": "ok",
-        "structural": false
-      },
-      "front4.jpg": {
-        "parts": [
-          {
-            "part": "headlamp",
-            "side": "front",
-            "severity": "moderate",
-            "action": "replace",
-            "confidence": 0.84,
-            "evidence": "cracked headlamp"
-          }
-        ],
-        "plate": null,
-        "quality": "ok",
-        "structural": false
-      }
-    },
-    "story_check": [
-      {
-        "story_zone": "rear",
-        "damage_zones": [
-          "front"
-        ],
-        "consistent": false,
-        "detail": "Story says rear-ended, but all damage is on the FRONT of the car."
-      },
-      {
-        "story_zone": "rear",
-        "damage_zones": [
-          "front"
-        ],
-        "consistent": false,
-        "detail": "Re-check confirms front-only damage; rear is undamaged."
-      }
-    ]
-  }
+    {
+      "id": "photo-1",
+      "path": "data/demo_claims/mismatch_front_rear/photos/evidence.jpg",
+      "exif_datetime": "2026-10-23T10:30:00",
+      "has_exif": true,
+      "phash": "f95b5725464c1d46"
+    }
+  ]
 }

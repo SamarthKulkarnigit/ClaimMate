@@ -1,0 +1,44 @@
+{
+ "damage": {
+  "*": {
+   "parts": [
+    {
+     "part": "front_bumper",
+     "side": "front",
+     "severity": "moderate",
+     "action": "replace",
+     "confidence": 0.88,
+     "evidence": "cracked bumper cover"
+    },
+    {
+     "part": "headlamp",
+     "side": "front",
+     "severity": "severe",
+     "action": "replace",
+     "confidence": 0.9,
+     "evidence": "right headlamp broken"
+    }
+   ],
+   "plate": "TEST0000",
+   "quality": "ok"
+  }
+ },
+ "story_check": [
+  {
+   "story_zone": "rear",
+   "damage_zones": [
+    "front"
+   ],
+   "consistent": false,
+   "detail": "Story says rear-ended, but all visible damage is on the FRONT."
+  },
+  {
+   "story_zone": "rear",
+   "damage_zones": [
+    "front"
+   ],
+   "consistent": false,
+   "detail": "Re-check confirms front-only damage; rear is undamaged."
+  }
+ ]
+}

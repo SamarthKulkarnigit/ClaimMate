@@ -3,13 +3,12 @@ from __future__ import annotations
 
 import asyncio
 import json
-import shutil
 import threading
 import traceback
 import uuid
 from pathlib import Path
 
-from fastapi import FastAPI, File, Form, HTTPException, UploadFile
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, StreamingResponse
 from langgraph.types import Command
@@ -18,6 +17,7 @@ from pydantic import BaseModel
 from backend import config
 from backend.agents.graph import GRAPH
 from backend.app import events
+from backend.app.demo_loader import list_demos, load_demo
 
 app = FastAPI(title="ClaimMate API")
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
@@ -48,8 +48,11 @@ def _settle_status(cid: str) -> None:
         STATUS[cid] = "rejected"
     else:
         STATUS[cid] = "done"
-    events.emit(cid, "done" if STATUS[cid] != "awaiting_approval" else "status", "coordinator",
-                f"Status: {STATUS[cid]}", {"status": STATUS[cid]})
+    if STATUS[cid] in ("filed", "rejected", "done"):
+        events.emit(cid, "done", "finalize" if STATUS[cid] == "filed" else "coordinator",
+                    {"filed": "Claim file ready and filed with the mock insurer.",
+                     "rejected": "Owner rejected the estimate. Nothing was filed."}.get(STATUS[cid], "Run complete."),
+                    {"status": STATUS[cid]})
 
 
 def _run(cid: str, payload) -> None:
@@ -82,53 +85,36 @@ def health():
 
 @app.get("/api/demo")
 def list_demo():
-    out = []
-    for d in sorted(DEMO_DIR.glob("*/claim.json")):
-        c = json.loads(d.read_text(encoding="utf-8"))
-        out.append({"name": d.parent.name, "title": c.get("title", d.parent.name), "story": c.get("story"),
-                    "expected": c.get("expected")})
-    return out
+    return list_demos()
 
 
 @app.post("/api/demo/{name}")
 def run_demo(name: str):
-    f = DEMO_DIR / name / "claim.json"
-    if not f.exists():
+    if not (DEMO_DIR / name / "claim.json").exists():
         raise HTTPException(404, "demo not found")
-    c = json.loads(f.read_text(encoding="utf-8"))
     cid = _new_id()
-    up = config.UPLOADS / cid
-    up.mkdir(parents=True, exist_ok=True)
-    photos = []
-    for i, fn in enumerate(c.get("photos", []), 1):
-        src = DEMO_DIR / name / fn
-        dst = up / f"P{i}{src.suffix.lower()}"
-        shutil.copy(src, dst)
-        photos.append({"id": f"P{i}", "path": str(dst), "name": fn})
-    mock = c.get("mock", {})
-    # remap mock keys from file names to photo ids
-    for key in ("damage", "damage_recheck"):
-        if isinstance(mock.get(key), dict):
-            mock[key] = {p["id"]: mock[key].get(p["name"], mock[key].get(p["id"])) for p in photos}
-    state = {"claim_id": cid, "story": c["story"], "accident_date": c["accident_date"], "vehicle": c["vehicle"],
-             "policy": c["policy"], "photos": photos, "mock": mock, "retries": 0, "trail": [],
-             "meta": {"demo": name, "expected": c.get("expected")}}
-    return {"claim_id": _start(state)}
+    return {"claim_id": _start(load_demo(name, cid))}
 
 
 @app.post("/api/claims")
-async def create_claim(photos: list[UploadFile] = File(...), story: str = Form(...), accident_date: str = Form(...),
-                       vehicle: str = Form(...), policy: str = Form(...)):
+async def create_claim(request: Request):
+    form = await request.form()
+    files = [f for f in form.getlist("photos[]") + form.getlist("photos") if hasattr(f, "read")]
+    if not files:
+        raise HTTPException(422, "at least one photo is required")
     cid = _new_id()
     up = config.UPLOADS / cid
     up.mkdir(parents=True, exist_ok=True)
     plist = []
-    for i, f in enumerate(photos, 1):
+    for i, f in enumerate(files, 1):
         dst = up / f"P{i}{Path(f.filename or 'x.jpg').suffix.lower() or '.jpg'}"
         dst.write_bytes(await f.read())
         plist.append({"id": f"P{i}", "path": str(dst), "name": f.filename})
-    state = {"claim_id": cid, "story": story, "accident_date": accident_date, "vehicle": json.loads(vehicle),
-             "policy": json.loads(policy), "photos": plist, "retries": 0, "trail": [], "meta": {}}
+    vehicle = json.loads(form.get("vehicle") or "{}")
+    vehicle.pop("age_months", None)  # recomputed from reg_date at accident date
+    state = {"claim_id": cid, "story": form.get("story", ""), "accident_date": form.get("accident_date"),
+             "vehicle": vehicle, "policy": json.loads(form.get("policy") or "{}"), "photos": plist,
+             "retries": 0, "trail": [], "meta": {}, "synthetic": False}
     return {"claim_id": _start(state)}
 
 
@@ -138,22 +124,32 @@ def get_claim(cid: str):
     if not v:
         raise HTTPException(404, "unknown claim")
     v.pop("mock", None)
-    for p in v.get("photos", []):
-        p["url"] = f"/api/claims/{cid}/photos/{p['id']}"
-    return {"status": STATUS.get(cid, "unknown"), "state": v}
+    v["photos"] = [{**p, "url": f"/api/claims/{cid}/photos/{p['id']}"} for p in v.get("photos", [])]
+    # UI lists non-covered items from `coverage`; include story items (e.g. engine noise) there too
+    v["coverage"] = list(v.get("coverage") or []) + [
+        {**x, "part": x.get("item", "other")} for x in (v.get("extra_items") or [])]
+    v["status"] = STATUS.get(cid, "unknown")
+    return v
 
 
 @app.get("/api/claims/{cid}/events")
-async def stream(cid: str):
+async def stream(cid: str, request: Request):
+    try:
+        start_at = int(request.headers.get("last-event-id", "-1")) + 1
+    except ValueError:
+        start_at = 0
+
     async def gen():
-        i = 0
-        while True:
-            for ev in events.since(cid, i):
+        i, idle = start_at, 0
+        yield "retry: 3000\n\n"
+        while not await request.is_disconnected():
+            new = events.since(cid, i)
+            for ev in new:
                 i += 1
-                yield f"data: {json.dumps(ev, ensure_ascii=False)}\n\n"
-            if STATUS.get(cid) in ("done", "filed", "rejected", "escalated", "error") and not events.since(cid, i):
-                yield "event: end\ndata: {}\n\n"
-                return
+                yield f"id: {ev['seq']}\ndata: {json.dumps(ev, ensure_ascii=False)}\n\n"
+            idle = 0 if new else idle + 1
+            if idle and idle % 60 == 0:
+                yield ": ping\n\n"
             await asyncio.sleep(0.25)
     return StreamingResponse(gen(), media_type="text/event-stream",
                              headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"})
@@ -166,8 +162,10 @@ class Approval(BaseModel):
 
 @app.post("/api/claims/{cid}/approve")
 def approve(cid: str, body: Approval):
-    if STATUS.get(cid) != "awaiting_approval":
-        raise HTTPException(409, f"claim is {STATUS.get(cid)}")
+    snap = GRAPH.get_state(_cfg(cid))
+    if not (snap and snap.next and "human" in snap.next):
+        raise HTTPException(409, f"claim is {STATUS.get(cid)}, not awaiting approval")
+    STATUS[cid] = "running"
     threading.Thread(target=_run, args=(cid, Command(resume=body.model_dump())), daemon=True).start()
     return {"ok": True}
 

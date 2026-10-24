@@ -1,0 +1,60 @@
+{
+ "damage": {
+  "*": {
+   "parts": [
+    {
+     "part": "rear_bumper",
+     "side": "rear",
+     "severity": "moderate",
+     "action": "replace",
+     "confidence": 0.88,
+     "evidence": "bumper cracked"
+    },
+    {
+     "part": "tail_lamp",
+     "side": "rear",
+     "severity": "severe",
+     "action": "replace",
+     "confidence": 0.9,
+     "evidence": "left tail lamp broken"
+    }
+   ],
+   "plate": "TEST0000",
+   "quality": "ok"
+  }
+ },
+ "policy": {
+  "coverage": [
+   {
+    "part": "rear_bumper",
+    "status": "covered",
+    "clause_id": "S1.PERIL.vi",
+    "reason": "Rear impact by another vehicle is accidental external damage."
+   },
+   {
+    "part": "tail_lamp",
+    "status": "covered",
+    "clause_id": "S1.PERIL.vi",
+    "reason": "Broken in the same impact, so it is covered."
+   }
+  ],
+  "extra_items": [
+   {
+    "item": "Engine noise",
+    "status": "not_covered",
+    "clause_id": "S1.EXCL.a",
+    "reason": "Mechanical breakdown is excluded unless the impact caused it; a surveyor must inspect."
+   }
+  ]
+ },
+ "story_check": [
+  {
+   "story_zone": "rear",
+   "damage_zones": [
+    "rear"
+   ],
+   "consistent": true,
+   "detail": "Story (rear impact) matches rear damage."
+  }
+ ]
+}

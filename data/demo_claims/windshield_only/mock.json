@@ -1,0 +1,28 @@
+{
+ "damage": {
+  "*": {
+   "parts": [
+    {
+     "part": "windshield",
+     "side": "front",
+     "severity": "moderate",
+     "action": "replace",
+     "confidence": 0.9,
+     "evidence": "crack across windshield"
+    }
+   ],
+   "plate": "TEST0000",
+   "quality": "ok"
+  }
+ },
+ "story_check": [
+  {
+   "story_zone": "front",
+   "damage_zones": [
+    "front"
+   ],
+   "consistent": true,
+   "detail": "Matches."
+  }
+ ]
+}

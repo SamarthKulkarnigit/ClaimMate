@@ -1,24 +1,22 @@
-model,part,material,price,source_url,checked_on
-swift,front_bumper,plastic,4200,TODO-samarth-add-marutisuzuki.com-genuine-parts-url,
-swift,rear_bumper,plastic,4500,TODO-samarth-add-marutisuzuki.com-genuine-parts-url,
-swift,headlamp,plastic,5200,TODO-samarth-add-marutisuzuki.com-genuine-parts-url,
-swift,tail_lamp,plastic,2600,TODO-samarth-add-marutisuzuki.com-genuine-parts-url,
-swift,fog_lamp,plastic,1400,TODO-samarth-add-marutisuzuki.com-genuine-parts-url,
-swift,grille,plastic,1500,TODO-samarth-add-marutisuzuki.com-genuine-parts-url,
-swift,bonnet,metal,7500,TODO-samarth-add-marutisuzuki.com-genuine-parts-url,
-swift,boot_lid,metal,8500,TODO-samarth-add-marutisuzuki.com-genuine-parts-url,
-swift,front_fender,metal,2800,TODO-samarth-add-marutisuzuki.com-genuine-parts-url,
-swift,front_door,metal,11000,TODO-samarth-add-marutisuzuki.com-genuine-parts-url,
-swift,side_mirror,plastic,3200,TODO-samarth-add-marutisuzuki.com-genuine-parts-url,
-swift,windshield,glass,6500,TODO-samarth-add-marutisuzuki.com-genuine-parts-url,
-swift,radiator,metal,6000,TODO-samarth-add-marutisuzuki.com-genuine-parts-url,
-baleno,front_bumper,plastic,4800,TODO-samarth-add-marutisuzuki.com-genuine-parts-url,
-baleno,rear_bumper,plastic,5000,TODO-samarth-add-marutisuzuki.com-genuine-parts-url,
-baleno,headlamp,plastic,7800,TODO-samarth-add-marutisuzuki.com-genuine-parts-url,
-baleno,tail_lamp,plastic,3400,TODO-samarth-add-marutisuzuki.com-genuine-parts-url,
-baleno,bonnet,metal,8500,TODO-samarth-add-marutisuzuki.com-genuine-parts-url,
-baleno,boot_lid,metal,9500,TODO-samarth-add-marutisuzuki.com-genuine-parts-url,
-baleno,front_fender,metal,3200,TODO-samarth-add-marutisuzuki.com-genuine-parts-url,
-baleno,rear_quarter_panel,metal,9000,TODO-samarth-add-marutisuzuki.com-genuine-parts-url,
-baleno,windshield,glass,7200,TODO-samarth-add-marutisuzuki.com-genuine-parts-url,
-baleno,rear_windshield,glass,5500,TODO-samarth-add-marutisuzuki.com-genuine-parts-url,
+model,part,material,price,source_url,checked_on,part_number,fitment_note
+Swift,front_bumper,plastic,2250,https://www.marutisuzuki.com/genuine-parts/front-bumper/71711m55r00-5pk,2026-10-24,71711M55R00-5PK,Swift 2017-2024; confirm variant and VIN
+Swift,rear_bumper,plastic,2830,https://www.marutisuzuki.com/genuine-parts/swift/bumpers-and-grilles,2026-10-24,71810M55R10-5PK,Swift 2017-2024 catalogue; confirm variant and VIN
+Swift,headlamp,plastic,2999,https://www.marutisuzuki.com/genuine-parts/head-lamp-assembly-right/35100m55r10,2026-10-24,35100M55R10,Right halogen assembly; selected Swift 2017-2022 variants; confirm VIN
+Swift,headlamp_left,plastic,2999,https://www.marutisuzuki.com/genuine-parts/head-lamp-assembly-left/35300m55r10,2026-10-24,35300M55R10,Left halogen assembly; selected Swift 2017-2022 variants; confirm VIN
+Swift,front_fender_right,metal,1435,https://www.marutisuzuki.com/genuine-parts/swift/body-exteriors,2026-10-24,57611M55R00,Swift 2017-2024 catalogue; confirm variant and VIN
+Swift,front_fender_left,metal,1435,https://www.marutisuzuki.com/genuine-parts/swift/body-exteriors,2026-10-24,57711M55R00,Swift 2017-2024 catalogue; confirm variant and VIN
+Swift,windshield,glass,4100,https://www.marutisuzuki.com/genuine-parts/swift/glass-and-windshield,2026-10-24,84511M55R00,Swift 2017-2024 catalogue; confirm variant and VIN
+Swift,rear_windshield,glass,2990,https://www.marutisuzuki.com/genuine-parts/swift/glass-and-windshield,2026-10-24,84570M55R00,Swift 2017-2024 catalogue; confirm variant and VIN
+Swift,front_door_glass_right,glass,1210,https://www.marutisuzuki.com/genuine-parts/swift/glass-and-windshield,2026-10-24,84501M55R00,Swift 2017-2024 catalogue; confirm variant and VIN
+Swift,lower_grille,plastic,160,https://www.marutisuzuki.com/genuine-parts/swift/bumpers-and-grilles,2026-10-24,71721M52R00-5PK,Swift 2017-2024 catalogue; confirm variant and VIN
+Baleno,front_bumper,plastic,2850,https://www.marutisuzuki.com/genuine-parts/baleno/bumpers-and-grilles,2026-10-24,71711M55T00-5PK,Baleno 2022 onwards; confirm variant and VIN
+Baleno,tail_lamp,plastic,4699,https://www.marutisuzuki.com/genuine-parts/tail-lamp-left/35750m55t12,2026-10-24,35750M55T12,Left lamp; Baleno 2022 onwards; confirm VIN
+Baleno,windshield,glass,4600,https://www.marutisuzuki.com/genuine-parts/glass-windshield/84051m55t01,2026-10-24,84051M55T01,Baleno 2022 onwards Sigma Delta Zeta; excludes Alpha; confirm VIN
+Baleno,front_fender_lining_left,plastic,530,https://www.marutisuzuki.com/genuine-parts/lining-front-fender-left/72340m55t00,2026-10-24,72340M55T00,Baleno 2022 onwards; confirm variant and VIN
+Baleno,front_fender_lining_right,plastic,530,https://www.marutisuzuki.com/genuine-parts/lining-front-fender-right/72320m55t00,2026-10-24,72320M55T00,Baleno 2022 onwards; confirm variant and VIN
+Baleno,lower_grille,plastic,370,https://www.marutisuzuki.com/genuine-parts/baleno/bumpers-and-grilles,2026-10-24,71721M55T00-5PK,Baleno 2022 onwards; confirm variant and VIN
+Baleno,upper_grille,plastic,733,https://www.marutisuzuki.com/genuine-parts/baleno/bumpers-and-grilles,2026-10-24,71740M55T00-C48,Baleno 2022 onwards; confirm variant and VIN
+Baleno,fog_lamp_bezel_right,plastic,115,https://www.marutisuzuki.com/genuine-parts/baleno/bumpers-and-grilles,2026-10-24,71751M55T00-5PK,Black bezel; Baleno 2022 onwards; confirm VIN
+Baleno,fog_lamp_bezel_left,plastic,115,https://www.marutisuzuki.com/genuine-parts/baleno/bumpers-and-grilles,2026-10-24,71761M55T00-5PK,Black bezel; Baleno 2022 onwards; confirm VIN
+Baleno,headlamp,plastic,13250,https://www.marutisuzuki.com/genuine-parts/head-lamp-assembly-right/35100m55t43,2026-10-24,35100M55T43,Right assembly; Baleno 2022 onwards Alpha ONLY; confirm VIN
+Baleno,rear_bumper,plastic,4100,https://www.marutisuzuki.com/genuine-parts/bumper-rear-black/71811m55t00-5pk,2026-10-24,71811M55T00-5PK,Demo fitment assumption Baleno 2022 onwards; product page omits fitment so confirm VIN; alternate short URL shows 4056

@@ -1,58 +1,32 @@
 {
-  "title": "Reused photo from an earlier claim",
-  "story": "Someone scraped my rear bumper in the office parking lot.",
-  "accident_date": "2026-10-19",
+  "claim_id": "DEMO-004",
+  "synthetic": true,
+  "story": "Hit a pole while parking; front bumper and right headlamp were damaged.",
+  "accident_date": "2026-10-23",
   "vehicle": {
     "make": "Maruti Suzuki",
-    "model": "swift",
-    "reg_no": "KA01AB1234",
+    "model": "Swift",
+    "reg_no": "TEST0000",
     "cc": 1197,
-    "reg_date": "2024-03-10"
+    "reg_date": "2024-04-23",
+    "age_months": 30
   },
   "policy": {
-    "policy_no": "OD/2026/778812",
-    "start": "2026-03-01",
-    "end": "2027-02-28",
-    "idv": 550000,
+    "policy_no": "DEMO-POLICY-0001",
+    "start": "2026-01-01",
+    "end": "2026-12-31",
+    "idv": 500000,
     "zero_dep": false,
-    "voluntary_deductible": 0
+    "voluntary_deductible": 0,
+    "pdf_path": "data/policy/standard_od_policy.pdf"
   },
   "photos": [
-    "old_claim.jpg"
-  ],
-  "expected": {
-    "audit": "escalate",
-    "covered": [
-      "rear_bumper"
-    ],
-    "not_covered": []
-  },
-  "mock": {
-    "damage": {
-      "old_claim.jpg": {
-        "parts": [
-          {
-            "part": "rear_bumper",
-            "side": "rear",
-            "severity": "minor",
-            "action": "repair",
-            "confidence": 0.8,
-            "evidence": "scrape marks"
-          }
-        ],
-        "plate": null,
-        "quality": "ok"
-      }
-    },
-    "story_check": [
-      {
-        "story_zone": "rear",
-        "damage_zones": [
-          "rear"
-        ],
-        "consistent": true,
-        "detail": "Matches."
-      }
-    ]
-  }
+    {
+      "id": "photo-1",
+      "path": "data/demo_claims/duplicate_photo/photos/evidence.jpg",
+      "exif_datetime": "2026-10-23T10:30:00",
+      "has_exif": true,
+      "phash": "bd56122f62494d57"
+    }
+  ]
 }

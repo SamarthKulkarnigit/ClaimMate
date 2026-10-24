@@ -19,6 +19,17 @@ $env:LLM_MOCK="0"; python -m scripts.eval clean_swift_front
 uvicorn backend.app.main:app --reload --port 8000
 ```
 
+## Run the full app (2 terminals)
+
+```powershell
+# terminal 1 - backend (LLM_MOCK=1 = canned answers, no API calls; 0 = real Ollama models)
+$env:LLM_MOCK="1"; uvicorn backend.app.main:app --reload --port 8000
+# terminal 2 - frontend (Vite proxies /api -> :8000)
+cd frontend; npm install; npm run dev     # open http://127.0.0.1:5173
+```
+
+Evaluate all 10 demo claims against `data/answer_key.json`: `python -m scripts.eval`
+
 ## API (for the frontend)
 
 | Method | Path | Notes |

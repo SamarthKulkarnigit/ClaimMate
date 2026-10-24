@@ -1,0 +1,297 @@
+{
+  "input": {
+    "claim_id": "DEMO-002",
+    "synthetic": true,
+    "story": "A low-speed rear impact damaged my bumper and left tail lamp. I also reported engine noise.",
+    "accident_date": "2026-10-23",
+    "vehicle": {
+      "make": "Maruti Suzuki",
+      "model": "Baleno",
+      "reg_no": "TEST0000",
+      "cc": 1197,
+      "reg_date": "2024-04-23",
+      "age_months": 30
+    },
+    "policy": {
+      "policy_no": "DEMO-POLICY-0001",
+      "start": "2026-01-01",
+      "end": "2026-12-31",
+      "idv": 500000,
+      "zero_dep": false,
+      "voluntary_deductible": 0,
+      "pdf_path": "data/policy/standard_od_policy.pdf"
+    },
+    "photos": [
+      {
+        "id": "photo-1",
+        "path": "data/demo_claims/partial_baleno_rear/photos/evidence.jpg",
+        "exif_datetime": "2026-10-23T10:30:00",
+        "has_exif": true,
+        "phash": "fd5a0265475d5946",
+        "url": "/demo/partial_baleno_rear.jpg"
+      }
+    ]
+  },
+  "state": {
+    "claim_id": "DEMO-002",
+    "synthetic": true,
+    "story": "A low-speed rear impact damaged my bumper and left tail lamp. I also reported engine noise.",
+    "accident_date": "2026-10-23",
+    "vehicle": {
+      "make": "Maruti Suzuki",
+      "model": "Baleno",
+      "reg_no": "TEST0000",
+      "cc": 1197,
+      "reg_date": "2024-04-23",
+      "age_months": 30
+    },
+    "policy": {
+      "policy_no": "DEMO-POLICY-0001",
+      "start": "2026-01-01",
+      "end": "2026-12-31",
+      "idv": 500000,
+      "zero_dep": false,
+      "voluntary_deductible": 0,
+      "pdf_path": "data/policy/standard_od_policy.pdf"
+    },
+    "photos": [
+      {
+        "id": "photo-1",
+        "path": "data/demo_claims/partial_baleno_rear/photos/evidence.jpg",
+        "exif_datetime": "2026-10-23T10:30:00",
+        "has_exif": true,
+        "phash": "fd5a0265475d5946",
+        "url": "/demo/partial_baleno_rear.jpg"
+      }
+    ],
+    "damages": [
+      {
+        "part": "rear_bumper",
+        "side": "rear",
+        "severity": "moderate",
+        "action": "replace",
+        "material": "plastic",
+        "photo_ids": [
+          "photo-1"
+        ],
+        "confidence": 0.94
+      },
+      {
+        "part": "tail_lamp",
+        "side": "rear",
+        "severity": "moderate",
+        "action": "replace",
+        "material": "plastic",
+        "photo_ids": [
+          "photo-1"
+        ],
+        "confidence": 0.94
+      }
+    ],
+    "coverage": [
+      {
+        "part": "rear_bumper",
+        "status": "covered",
+        "clause_id": "Section I(vi)",
+        "clause_quote": "by accidental external means;",
+        "reason": "Synthetic scenario assumes admissible accidental external damage."
+      },
+      {
+        "part": "tail_lamp",
+        "status": "covered",
+        "clause_id": "Section I(vi)",
+        "clause_quote": "by accidental external means;",
+        "reason": "Synthetic scenario assumes admissible accidental external damage."
+      },
+      {
+        "part": "engine_noise",
+        "status": "not_covered",
+        "clause_id": "Section I - exclusion (a)",
+        "clause_quote": "",
+        "reason": "Fixture assumption: inspection attributes engine noise to pre-existing mechanical breakdown, not the impact. Real causation requires a surveyor."
+      }
+    ],
+    "estimate": {
+      "lines": [
+        {
+          "part": "rear_bumper",
+          "action": "replace",
+          "part_price": 4100.0,
+          "part_source_url": "https://www.marutisuzuki.com/genuine-parts/bumper-rear-black/71811m55t00-5pk",
+          "labour_low": 600,
+          "labour_high": 1000,
+          "paint": 0,
+          "material": "plastic",
+          "dep_pct": 0.5,
+          "dep_amount": 2050.0,
+          "payable_low": 2650.0,
+          "payable_high": 3050.0,
+          "clause_id": "Section I(vi)",
+          "photo_ids": [
+            "photo-1"
+          ],
+          "note": "Labour is an assumption; painting excluded from this fixture. Demo fitment assumption Baleno 2022 onwards; product page omits fitment so confirm VIN; alternate short URL shows 4056"
+        },
+        {
+          "part": "tail_lamp",
+          "action": "replace",
+          "part_price": 4699.0,
+          "part_source_url": "https://www.marutisuzuki.com/genuine-parts/tail-lamp-left/35750m55t12",
+          "labour_low": 250,
+          "labour_high": 450,
+          "paint": 0,
+          "material": "plastic",
+          "dep_pct": 0.5,
+          "dep_amount": 2349.5,
+          "payable_low": 2599.5,
+          "payable_high": 2799.5,
+          "clause_id": "Section I(vi)",
+          "photo_ids": [
+            "photo-1"
+          ],
+          "note": "Labour is an assumption; painting excluded from this fixture. Left lamp; Baleno 2022 onwards; confirm VIN"
+        }
+      ],
+      "totals": {
+        "gross_low": 9649.0,
+        "gross_high": 10249.0,
+        "depreciation": 4399.5,
+        "deductible": 1000,
+        "payable_low": 4249.5,
+        "payable_high": 4849.5
+      }
+    },
+    "audit": {
+      "status": "pass",
+      "findings": [
+        {
+          "check": "A1",
+          "ok": true,
+          "detail": "Capture date matches the accident date and policy period."
+        },
+        {
+          "check": "A2",
+          "ok": true,
+          "detail": "No matching image in the prior-claim fixture index."
+        },
+        {
+          "check": "A3",
+          "ok": true,
+          "detail": "Fixture plate matches the supplied vehicle record."
+        },
+        {
+          "check": "A4",
+          "ok": true,
+          "detail": "Incident location agrees with the fixture damage labels."
+        },
+        {
+          "check": "A5",
+          "ok": true,
+          "detail": "Each estimate line has evidence and a coverage decision."
+        },
+        {
+          "check": "A6",
+          "ok": true,
+          "detail": "Fixture confidence is above 0.6; no structural damage is specified."
+        }
+      ]
+    },
+    "plate_read": "TEST0000",
+    "retries": 0,
+    "next": "human",
+    "decision": null
+  },
+  "events": [
+    {
+      "type": "agent_start",
+      "agent": "intake",
+      "ts": "2026-10-24T05:30:00Z",
+      "text": "Photo metadata and duplicate signals collected.",
+      "data": {}
+    },
+    {
+      "type": "agent_end",
+      "agent": "intake",
+      "ts": "2026-10-24T05:30:01Z",
+      "text": "Intake complete.",
+      "data": {}
+    },
+    {
+      "type": "agent_start",
+      "agent": "coordinator",
+      "ts": "2026-10-24T05:30:02Z",
+      "text": "Routing the evidence for assessment.",
+      "data": {}
+    },
+    {
+      "type": "agent_end",
+      "agent": "coordinator",
+      "ts": "2026-10-24T05:30:03Z",
+      "text": "Coordinator complete.",
+      "data": {}
+    },
+    {
+      "type": "agent_start",
+      "agent": "damage",
+      "ts": "2026-10-24T05:30:04Z",
+      "text": "Fixture damage tags added.",
+      "data": {}
+    },
+    {
+      "type": "agent_end",
+      "agent": "damage",
+      "ts": "2026-10-24T05:30:05Z",
+      "text": "Damage complete.",
+      "data": {}
+    },
+    {
+      "type": "agent_start",
+      "agent": "policy",
+      "ts": "2026-10-24T05:30:06Z",
+      "text": "Coverage decisions linked to policy references.",
+      "data": {}
+    },
+    {
+      "type": "agent_end",
+      "agent": "policy",
+      "ts": "2026-10-24T05:30:07Z",
+      "text": "Policy complete.",
+      "data": {}
+    },
+    {
+      "type": "agent_start",
+      "agent": "cost",
+      "ts": "2026-10-24T05:30:08Z",
+      "text": "Estimate calculated from the catalogue and fixed rules.",
+      "data": {}
+    },
+    {
+      "type": "agent_end",
+      "agent": "cost",
+      "ts": "2026-10-24T05:30:09Z",
+      "text": "Cost complete.",
+      "data": {}
+    },
+    {
+      "type": "agent_start",
+      "agent": "auditor",
+      "ts": "2026-10-24T05:30:10Z",
+      "text": "Running six consistency checks.",
+      "data": {}
+    },
+    {
+      "type": "agent_end",
+      "agent": "auditor",
+      "ts": "2026-10-24T05:30:11Z",
+      "text": "Auditor complete.",
+      "data": {}
+    },
+    {
+      "type": "interrupt",
+      "agent": "human",
+      "ts": "2026-10-24T05:30:12Z",
+      "text": "Checks complete. Your review is required before preparing the claim file.",
+      "data": {}
+    }
+  ]
+}
