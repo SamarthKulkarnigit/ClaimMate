@@ -99,8 +99,12 @@ def coordinator(state: ClaimState):
             elif nxt == "policy":
                 upd.update({"coverage": None})
             emit(cid, "send_back", "coordinator", why, {"to": nxt, "send_back_to": nxt, "retry": retries + 1, "retries": retries + 1})
-    elif not state.get("damages"):
+    elif state.get("damages") is None:
         nxt, why = "damage", "Need damage assessment from photos."
+    elif not state.get("damages"):
+        # assessed but nothing visible: don't loop back to the vision agent - let the Auditor decide (A6)
+        nxt, why = "auditor", "No damage detected in any photo. Auditor must decide whether clearer evidence is needed."
+        upd = {"coverage": [], "estimate": {"lines": [], "totals": {}}}
     elif state.get("coverage") is None:
         nxt, why = "policy", "Damage known. Need policy coverage per part."
     elif state.get("estimate") is None:
