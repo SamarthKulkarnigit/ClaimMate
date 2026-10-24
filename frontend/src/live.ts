@@ -13,7 +13,7 @@ export function applyEvent(state: LiveState, event: ClaimEvent): LiveState {
     next.phase = 'running';
   }
   if (event.type === 'interrupt') { next.phase = 'review'; next.statuses.human = 'review'; }
-  if (event.type === 'escalate') { next.phase = 'escalated'; next.statuses.auditor = 'failed'; }
+  if (event.type === 'escalate') { next.phase = 'escalated'; next.statuses.auditor = 'review'; }
   if (event.type === 'done') { next.phase = 'done'; next.statuses.finalize = 'complete'; }
   if (event.type === 'error') { next.phase = 'error'; next.statuses[event.agent] = 'failed'; }
   return next;

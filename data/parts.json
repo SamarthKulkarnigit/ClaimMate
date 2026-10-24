@@ -1,5 +1,5 @@
 {
- "_note": "Part vocabulary shared by the vision prompt, price table and UI. Labour/paint ranges in INR are ASSUMPTIONS for a hatchback/sedan at an authorised workshop; shown as such in the UI and claim file. data/labour.json (Samarth) overrides these labour ranges where a part is listed.",
+ "_note": "Part vocabulary shared by the vision prompt, price table and UI. Labour/paint ranges in INR are ASSUMPTIONS for a hatchback/sedan at an authorised workshop; shown as such in the UI and claim file. data/labour.json (Samarth) overrides these labour ranges where a part is listed. ref_price = REFERENCE ESTIMATE for a Maruti hatchback/sedan genuine part, used ONLY when data/prices.csv has no catalogue row; always shown as unverified.",
  "parts": {
   "front_bumper": {
    "name": "Front bumper",
@@ -16,7 +16,8 @@
    "paint": [
     2500,
     4000
-   ]
+   ],
+   "ref_price": 2500
   },
   "rear_bumper": {
    "name": "Rear bumper",
@@ -33,7 +34,8 @@
    "paint": [
     2500,
     4000
-   ]
+   ],
+   "ref_price": 2800
   },
   "headlamp": {
    "name": "Headlamp assembly",
@@ -44,7 +46,8 @@
     300,
     600
    ],
-   "paint": null
+   "paint": null,
+   "ref_price": 6000
   },
   "tail_lamp": {
    "name": "Tail lamp assembly",
@@ -55,7 +58,8 @@
     200,
     500
    ],
-   "paint": null
+   "paint": null,
+   "ref_price": 3000
   },
   "fog_lamp": {
    "name": "Fog lamp",
@@ -66,7 +70,8 @@
     200,
     400
    ],
-   "paint": null
+   "paint": null,
+   "ref_price": 1200
   },
   "grille": {
    "name": "Front grille",
@@ -77,7 +82,8 @@
     200,
     400
    ],
-   "paint": null
+   "paint": null,
+   "ref_price": 1200
   },
   "bonnet": {
    "name": "Bonnet / hood",
@@ -94,7 +100,8 @@
    "paint": [
     3500,
     5500
-   ]
+   ],
+   "ref_price": 7500
   },
   "boot_lid": {
    "name": "Boot lid / tailgate",
@@ -111,7 +118,8 @@
    "paint": [
     3500,
     5500
-   ]
+   ],
+   "ref_price": 8500
   },
   "front_fender": {
    "name": "Front fender",
@@ -128,7 +136,8 @@
    "paint": [
     2500,
     4000
-   ]
+   ],
+   "ref_price": 1500
   },
   "rear_quarter_panel": {
    "name": "Rear quarter panel",
@@ -145,7 +154,8 @@
    "paint": [
     3000,
     5000
-   ]
+   ],
+   "ref_price": 9000
   },
   "front_door": {
    "name": "Front door",
@@ -162,7 +172,8 @@
    "paint": [
     3000,
     5000
-   ]
+   ],
+   "ref_price": 9500
   },
   "rear_door": {
    "name": "Rear door",
@@ -179,7 +190,8 @@
    "paint": [
     3000,
     5000
-   ]
+   ],
+   "ref_price": 9000
   },
   "side_mirror": {
    "name": "Outside rear-view mirror",
@@ -190,7 +202,8 @@
     200,
     400
    ],
-   "paint": null
+   "paint": null,
+   "ref_price": 2800
   },
   "windshield": {
    "name": "Front windshield",
@@ -201,7 +214,8 @@
     800,
     1500
    ],
-   "paint": null
+   "paint": null,
+   "ref_price": 4300
   },
   "rear_windshield": {
    "name": "Rear windshield",
@@ -212,7 +226,8 @@
     800,
     1500
    ],
-   "paint": null
+   "paint": null,
+   "ref_price": 3000
   },
   "radiator": {
    "name": "Radiator",
@@ -223,7 +238,8 @@
     800,
     1500
    ],
-   "paint": null
+   "paint": null,
+   "ref_price": 5500
   },
   "alloy_wheel": {
    "name": "Wheel rim",
@@ -237,7 +253,8 @@
     200,
     400
    ],
-   "paint": null
+   "paint": null,
+   "ref_price": 6000
   },
   "tyre": {
    "name": "Tyre",
@@ -248,7 +265,8 @@
     200,
     400
    ],
-   "paint": null
+   "paint": null,
+   "ref_price": 4500
   },
   "front_fender_right": {
    "name": "Front fender (right)",
@@ -265,7 +283,8 @@
    "paint": [
     2500,
     4000
-   ]
+   ],
+   "ref_price": 1500
   },
   "front_fender_left": {
    "name": "Front fender (left)",
@@ -282,7 +301,8 @@
    "paint": [
     2500,
     4000
-   ]
+   ],
+   "ref_price": 1500
   },
   "headlamp_left": {
    "name": "Headlamp assembly (left)",
@@ -293,7 +313,8 @@
     300,
     600
    ],
-   "paint": null
+   "paint": null,
+   "ref_price": 6000
   },
   "upper_grille": {
    "name": "Upper grille",
@@ -304,7 +325,8 @@
     200,
     400
    ],
-   "paint": null
+   "paint": null,
+   "ref_price": 800
   },
   "lower_grille": {
    "name": "Lower grille",
@@ -315,7 +337,8 @@
     200,
     400
    ],
-   "paint": null
+   "paint": null,
+   "ref_price": 400
   },
   "front_door_glass_right": {
    "name": "Front door glass (right)",
@@ -326,7 +349,8 @@
     700,
     1200
    ],
-   "paint": null
+   "paint": null,
+   "ref_price": 1200
   }
  }
 }

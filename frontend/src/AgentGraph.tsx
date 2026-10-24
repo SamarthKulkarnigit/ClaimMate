@@ -1,4 +1,5 @@
-import { ReactFlow, Background, Controls, Handle, Position, MarkerType, type NodeProps } from '@xyflow/react';
+import { useEffect, useRef } from 'react';
+import { ReactFlow, Background, Controls, Handle, Position, MarkerType, type NodeProps, type ReactFlowInstance } from '@xyflow/react';
 import { ScanLine, Network, Camera, BookOpen, Calculator, ShieldCheck, UserRound, FileCheck2, Check } from 'lucide-react';
 import type { Agent } from './types';
 import type { LiveState, NodeStatus } from './live';
@@ -21,10 +22,18 @@ function AgentNode({ data }: NodeProps) {
   </div>;
 }
 const nodeTypes = { agent: AgentNode };
+const FIT = { padding: .12, minZoom: .45, maxZoom: 1 };
 export default function AgentGraph({ live }: { live: LiveState }) {
+  const flow = useRef<ReactFlowInstance | null>(null);
+  const box = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const el = box.current; if (!el || typeof ResizeObserver === 'undefined') return;
+    const ro = new ResizeObserver(() => requestAnimationFrame(() => flow.current?.fitView(FIT)));
+    ro.observe(el); return () => ro.disconnect();
+  }, []);
   const nodes = agents.map(([id, label, subtitle, x, y, icon]) => ({ id, type: 'agent', position: { x, y }, data: { agent: id, label, subtitle, icon, status: live.statuses[id as Agent] || 'waiting' } }));
   const links = [['intake', 'coordinator'], ['coordinator', 'damage'], ['coordinator', 'policy'], ['coordinator', 'cost'], ['damage', 'auditor'], ['policy', 'auditor'], ['cost', 'auditor'], ['auditor', 'human'], ['human', 'finalize']];
   const edges = links.map(([source, target]) => ({ id: `${source}-${target}`, source, target, type: 'smoothstep', animated: live.statuses[target as Agent] === 'running', style: { stroke: live.statuses[source as Agent] === 'complete' ? '#16a384' : '#c7d4de', strokeWidth: 1.8 }, markerEnd: { type: MarkerType.ArrowClosed, color: '#a9bac8' } }));
   if (live.retries) edges.push({ id: 'retry', source: 'auditor', target: 'coordinator', type: 'smoothstep', animated: live.phase === 'running', style: { stroke: '#d98739', strokeWidth: 2 }, markerEnd: { type: MarkerType.ArrowClosed, color: '#d98739' } });
-  return <div className="graph" aria-label="Live agent workflow"><ReactFlow nodes={nodes} edges={edges} nodeTypes={nodeTypes} fitView fitViewOptions={{ padding: .12, minZoom: .65, maxZoom: 1 }} nodesDraggable={false} nodesConnectable={false} elementsSelectable={false} panOnDrag zoomOnScroll={false} minZoom={.5} maxZoom={1.3}><Background color="#d8e2eb" gap={20}/><Controls showInteractive={false}/></ReactFlow></div>;
+  return <div ref={box} className="graph" aria-label="Live agent workflow"><ReactFlow onInit={inst => { flow.current = inst as unknown as ReactFlowInstance; setTimeout(() => inst.fitView(FIT), 60); }} nodes={nodes} edges={edges} nodeTypes={nodeTypes} fitView fitViewOptions={FIT} nodesDraggable={false} nodesConnectable={false} elementsSelectable={false} panOnDrag zoomOnScroll={false} minZoom={.4} maxZoom={1.3}><Background color="#d8e2eb" gap={20}/><Controls showInteractive={false}/></ReactFlow></div>;
 }

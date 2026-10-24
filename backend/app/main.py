@@ -48,6 +48,10 @@ def _settle_status(cid: str) -> None:
         STATUS[cid] = "rejected"
     else:
         STATUS[cid] = "done"
+    if STATUS[cid] == "escalated":
+        reasons = (v.get("escalation") or {}).get("reasons", [])
+        events.emit(cid, "escalate", "auditor", "Handed to a human surveyor: " + "; ".join(reasons[:2]),
+                    {"status": "escalated", "reasons": reasons})
     if STATUS[cid] in ("filed", "rejected", "done"):
         events.emit(cid, "done", "finalize" if STATUS[cid] == "filed" else "coordinator",
                     {"filed": "Claim file ready and filed with the mock insurer.",
