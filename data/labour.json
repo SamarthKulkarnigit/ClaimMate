@@ -1,0 +1,146 @@
+{
+  "front_bumper": {
+    "repair": [
+      900,
+      1500
+    ],
+    "replace": [
+      600,
+      1000
+    ],
+    "paint": [
+      1800,
+      2600
+    ]
+  },
+  "rear_bumper": {
+    "repair": [
+      900,
+      1500
+    ],
+    "replace": [
+      600,
+      1000
+    ],
+    "paint": [
+      1800,
+      2600
+    ]
+  },
+  "headlamp": {
+    "replace": [
+      250,
+      450
+    ]
+  },
+  "headlamp_left": {
+    "replace": [
+      250,
+      450
+    ]
+  },
+  "front_fender_right": {
+    "repair": [
+      900,
+      1500
+    ],
+    "replace": [
+      600,
+      1000
+    ],
+    "paint": [
+      1800,
+      2600
+    ]
+  },
+  "front_fender_left": {
+    "repair": [
+      900,
+      1500
+    ],
+    "replace": [
+      600,
+      1000
+    ],
+    "paint": [
+      1800,
+      2600
+    ]
+  },
+  "windshield": {
+    "replace": [
+      700,
+      1200
+    ]
+  },
+  "rear_windshield": {
+    "replace": [
+      700,
+      1200
+    ]
+  },
+  "front_door_glass_right": {
+    "replace": [
+      700,
+      1200
+    ]
+  },
+  "lower_grille": {
+    "replace": [
+      250,
+      450
+    ]
+  },
+  "tail_lamp": {
+    "replace": [
+      250,
+      450
+    ]
+  },
+  "front_fender_lining_left": {
+    "repair": [
+      900,
+      1500
+    ],
+    "replace": [
+      600,
+      1000
+    ],
+    "paint": [
+      1800,
+      2600
+    ]
+  },
+  "front_fender_lining_right": {
+    "repair": [
+      900,
+      1500
+    ],
+    "replace": [
+      600,
+      1000
+    ],
+    "paint": [
+      1800,
+      2600
+    ]
+  },
+  "upper_grille": {
+    "replace": [
+      250,
+      450
+    ]
+  },
+  "fog_lamp_bezel_right": {
+    "replace": [
+      250,
+      450
+    ]
+  },
+  "fog_lamp_bezel_left": {
+    "replace": [
+      250,
+      450
+    ]
+  }
+}

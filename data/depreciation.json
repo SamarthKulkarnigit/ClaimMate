@@ -1,0 +1,15 @@
+{
+  "source_url": "https://www.royalsundaram.in/assets/standalone-motor-own-damage-policy-private-car-rev2023.pdf",
+  "source_section": "Section I, depreciation on replacement parts and painting",
+  "rate_unit": "fraction (0.50 means 50%)",
+  "materials": {"rubber": 0.5, "nylon": 0.5, "plastic": 0.5, "tyres": 0.5, "tubes": 0.5, "batteries": 0.5, "fibreglass": 0.3, "glass": 0.0, "paint": 0.5},
+  "other_parts_age_bands": [
+    {"max_months": 6, "rate": 0.0}, {"max_months": 12, "rate": 0.05},
+    {"max_months": 24, "rate": 0.1}, {"max_months": 36, "rate": 0.15},
+    {"max_months": 48, "rate": 0.25}, {"max_months": 60, "rate": 0.35},
+    {"max_months": 120, "rate": 0.4}, {"max_months": null, "rate": 0.5}
+  ],
+  "paint_material_fraction_of_consolidated_bill": 0.25,
+  "zero_dep": {"rate": 0.0, "note": "Demo assumption: caller must verify the actual add-on applies to the part and claim."},
+  "compulsory_deductible": {"cc_threshold": 1500, "at_or_below": 1000, "above": 2000, "source_url": "https://www.icicilombard.com/blog/car-insurance/car/compulsory-vs-voluntary-deductible-in-car-insurance"}
+}

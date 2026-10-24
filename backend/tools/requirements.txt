@@ -1,0 +1,5 @@
+Pillow>=11,<14
+ImageHash==4.3.2
+reportlab>=4,<6
+pytest>=8,<10
+pypdf>=5,<7
