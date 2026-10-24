@@ -105,16 +105,32 @@ def chat_json(
                     json=payload,
                     timeout=config.LLM_TIMEOUT,
                 )
-                if r.status_code == 429:
-                    time.sleep(2 * (attempt + 1))
-                    raise LLMError(f"{model}: rate limited")
-                r.raise_for_status()
-                content = r.json().get("message", {}).get("content", "")
-                data = _parse_json(content)
-                if use_cache:
-                    cache_file.write_text(json.dumps(data, ensure_ascii=False), encoding="utf-8")
-                return data
-            except Exception as e:  # noqa: BLE001 - we want to try the next model
-                last_err = e
+            except httpx.HTTPError as e:
+                last_err = LLMError(f"{model}: {type(e).__name__}: {e}")
+                continue
+            if r.status_code in (401, 403):
+                # every model would fail the same way - stop instead of burning retries
+                raise LLMError(f"Ollama rejected the API key (HTTP {r.status_code}). Check OLLAMA_API_KEY in .env.")
+            if r.status_code == 404:
+                last_err = LLMError(f"{model}: model not found on {config.OLLAMA_HOST} (HTTP 404)")
+                break  # retrying an unknown model is pointless; try the next one
+            if r.status_code == 429:
+                last_err = LLMError(f"{model}: rate limited (HTTP 429)")
+                time.sleep(2 * (attempt + 1))
+                continue
+            if r.status_code >= 400:
+                last_err = LLMError(f"{model}: HTTP {r.status_code} {r.text[:200]}")
+                continue
+            try:
+                data = _parse_json(r.json().get("message", {}).get("content", ""))
+            except (ValueError, AttributeError) as e:
+                last_err = LLMError(f"{model}: unparseable JSON reply ({e})")
+                continue
+            if not isinstance(data, dict):
+                last_err = LLMError(f"{model}: expected a JSON object, got {type(data).__name__}")
+                continue
+            if use_cache:
+                cache_file.write_text(json.dumps(data, ensure_ascii=False), encoding="utf-8")
+            return data
         # try next model
-    raise LLMError(f"All models failed: {last_err}")
+    raise LLMError(f"All models failed. Last error: {last_err}")

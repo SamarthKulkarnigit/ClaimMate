@@ -30,6 +30,12 @@ cd frontend; npm install; npm run dev     # open http://127.0.0.1:5173
 
 Evaluate all 10 demo claims against `data/answer_key.json`: `python -m scripts.eval`
 
+## Troubleshooting real photos
+
+- **"No damage detected" on your own photos:** check `curl http://127.0.0.1:8000/api/health`. With `"mock": true` (`LLM_MOCK=1`), no AI model is called and uploads get no analysis. The UI warns about this on the New claim page. Restart with `LLM_MOCK=0`.
+- **"Damage assessment failed for P1 …":** the vision model could not be reached. Run `python -m scripts.check_models`. It tests the key and every model in `VISION_MODELS` / `TEXT_MODELS`. Replace any model marked FAIL in `.env`.
+- **"No EXIF capture date":** expected for downloaded or WhatsApp images, which have their metadata stripped. It is a warning, not a block.
+
 ## API (for the frontend)
 
 | Method | Path | Notes |

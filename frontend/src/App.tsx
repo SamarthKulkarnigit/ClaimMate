@@ -170,7 +170,7 @@ export default function App() {
       {mode === 'preview' && <div className="preview-banner"><span><FlaskIcon/>Synthetic preview · Scripted events and test diagrams. No model assessment or insurer submission.</span><button onClick={() => changeMode('live')}>Connect backend <ArrowRight size={14}/></button></div>}
       {mode === 'live' && backendMock && <div className="preview-banner"><span><FlaskIcon/>Backend mock mode (LLM_MOCK=1) · Agents return canned demo answers. Tools, rules and audit logic run for real; this is not model inference.</span></div>}
       {error && <div className="error-banner" role="alert"><AlertTriangle size={18}/>{redact(error, claim)}<button aria-label="Dismiss error" onClick={() => setError('')}><X size={16}/></button></div>}
-      {page === 'upload' && <UploadForm disabled={mode !== 'live' || busy} busy={busy} onSubmit={upload} />}
+      {page === 'upload' && <UploadForm disabled={mode !== 'live' || busy} busy={busy} mock={mode === 'live' && backendMock} onSubmit={upload} />}
       {page === 'sources' && <Sources />}
       {page === 'assessment' && <>
         <section className="demo-bar"><div><span className="small-icon"><Network size={18}/></span><div><strong>Explore a claim</strong><small>{demos.find(d => d.name === selected)?.description || 'Select a scenario to get started'}</small></div></div><div className="demo-actions"><select aria-label="Demo scenario" value={selected} onChange={e => setSelected(e.target.value)} disabled={busy || live.phase === 'running'}>{demos.map(d => <option key={d.name} value={d.name}>{d.title || title(d.name)}</option>)}</select><button className="secondary" disabled={busy || !demos.length || live.phase === 'running'} onClick={runDemo}><RefreshCw size={15}/>{claim ? 'Run again' : 'Run demo'}</button>{live.phase === 'running' && <button className="text-button" onClick={() => { clear(); setConnection('Stopped viewing updates'); }}>Stop viewing</button>}</div></section>
@@ -190,7 +190,7 @@ export default function App() {
 }
 function FlaskIcon() { return <span className="preview-symbol">◇</span>; }
 
-function UploadForm({ disabled, busy, onSubmit }: { disabled: boolean; busy: boolean; onSubmit: (form: FormData, files: File[]) => Promise<void> }) {
+function UploadForm({ disabled, busy, mock, onSubmit }: { disabled: boolean; busy: boolean; mock: boolean; onSubmit: (form: FormData, files: File[]) => Promise<void> }) {
   const [files, setFiles] = useState<File[]>([]);
   const [error, setError] = useState('');
   function select(list: FileList | null) {
@@ -216,6 +216,7 @@ function UploadForm({ disabled, busy, onSubmit }: { disabled: boolean; busy: boo
   return <form className="panel upload-form" onSubmit={submit}>
     <div className="panel-heading"><div><h2>New claim</h2><p>Photographs help classify damage. Prices come from a sourced catalogue.</p></div></div>
     {disabled && !busy && <div className="form-notice">Switch to Live backend mode to submit a new claim.</div>}
+    {mock && <div className="form-notice" role="alert"><AlertTriangle size={16}/> The backend is in mock mode (LLM_MOCK=1). Uploaded photos are not analysed by any AI model, so the claim will escalate with “no damage detected”. Restart the backend with LLM_MOCK=0 and a valid OLLAMA_API_KEY to assess real photos.</div>}
     <fieldset disabled={disabled}><div className="upload-zone" onDragOver={e => e.preventDefault()} onDrop={e => { e.preventDefault(); if (!disabled) select(e.dataTransfer.files); }}><UploadCloud size={32}/><strong>Add damage photos</strong><p>Drop photos here or choose files · up to 10 images, 8 MB each</p><input aria-label="Damage photos" type="file" accept="image/jpeg,image/png,image/webp" multiple onChange={e => select(e.target.files)}/></div>
     {files.length > 0 && <div className="file-list">{files.map((file, i) => <span key={`${file.name}-${i}`}><Camera size={14}/>{file.name}<button type="button" aria-label={`Remove ${file.name}`} onClick={() => setFiles(old => old.filter((_, index) => i !== index))}><X size={13}/></button></span>)}</div>}
     <label>What happened?<textarea name="story" required maxLength={2000} placeholder="Describe the incident, where the vehicle was hit, and the damage you noticed."/></label>
