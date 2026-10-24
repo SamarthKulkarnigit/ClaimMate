@@ -44,13 +44,36 @@ Import with `from backend.tools.depreciation import depreciation_pct` when runni
 
 This creates ten diagrams with deterministic EXIF/pHash signals and three scripted UI replays with PDF/email samples. They do not measure model performance. `past_claims_hashes.json` contains exactly one labelled synthetic prior record.
 
-## Integration still required from Role A
+## Integration status (re-verified after Role A's merge, 24 Oct 2026)
 
-1. Import these implementations in intake, cost and finalize; preserve error states rather than treating missing data as zero/clean.
-2. Serve the API and SSE routes specified in `docs/PLAN.md`, with durable claim state retrievable by GET.
-3. On human interrupt, leave the claim in `next='human'`; emit `interrupt`. On resume emit fresh events and a final `done` after `outputs.pdf_path` and `outputs.email_text` are persisted. Enforce approval and retry limits on the server.
-4. Local `photos[].path` is not a browser URL. Uploaded photos use local browser previews; backend demos need an optional `photos[].url` under `/api/` or a new agreed evidence-serving route. This optional UI extension is documented, not assumed to exist.
-5. Supply the policy PDF at `data/policy/standard_od_policy.pdf` before RAG ingestion. Official download attempts returned HTTP 403. No substitute or generated policy was inserted.
-6. Run the ten claims through the real agents after real damage photos are supplied. Record model agreement separately from unit-test results.
+The graph uses Role A's `rules.py` (depreciation, prices, labour, estimate lines) and `claim_file.py` (PDF + email) instead of `depreciation.py`, `prices.py`, `claim_pdf.py` and `email_draft.py`. `rules.depreciation_pct` matches `depreciation.depreciation_pct` for every catalogue material at ages 0-159 months, with and without zero-dep. Labour lookups match too. Role B kept `claim_file.py` as the live renderer and patched it:
 
-Validation: 64 Python tests cover depreciation boundaries, paint material, invalid inputs, EXIF, pHash thresholds, date checks, catalogue provenance, fixture isolation, PDF text/masking and pagination. The sample PDF was rendered and visually checked. Full backend/LLM integration remains pending.
+- Story, LLM reasons, audit details and escalation reasons are escaped and masked. Previously, `<` or `&` in a story crashed finalize.
+- The PDF now carries an "estimate for review" line, a synthetic-fixture label, per-line policy text marked unverified, parts-source URLs or "garage quote needed", and the policy source. The evidence-photo heading no longer strands at a page break.
+- The email has a synthetic label, estimated payable, and a "DRAFT ONLY - not sent" footer.
+
+`forensics.remember()` records completed live claims in the gitignored `outputs/claim_hashes.json`. `find_duplicate()` reads the committed fixture index plus that runtime index. Live uploads no longer modify `data/past_claims_hashes.json`.
+
+Verified with `LLM_MOCK=1` through the React UI (live mode, Vite proxy):
+- the 10 demo claims, with approve and reject;
+- PDF and email download;
+- SSE replay after resume;
+- photo URLs.
+
+Real Ollama inference has not been exercised here (no API key).
+
+### Open items for Role A
+
+Resolved on `main` by Role A: the zero-damage loop (an empty damage list now goes to the Auditor and escalates via A6) and `MAX_SEND_BACKS` (now 2; the mismatch demo shows 2 / 2 re-checks). Escalations also produce a surveyor hand-off PDF and email; the merged email keeps the masking, synthetic label and DRAFT footer.
+
+1. `data/policy/clauses.json`: explanatory glosses were moved from `text` (shown as the policy excerpt) to `note`. Their keywords were copied into `tags`. Demo-story retrieval is unchanged. Part queries keep the same top two clauses; only the weak third match changed (`S1.EXCL.a` → `GE.1`). Consider indexing `note` in `rag/search.py`.
+2. Optional: expose `MAX_SEND_BACKS` in `/api/health` so the UI does not hard-code the denominator.
+
+### Still blocked
+
+- Policy PDF at `data/policy/standard_od_policy.pdf`: official downloads return HTTP 403. No substitute was inserted, and `clauses.json` is marked `verified_against_pdf: false`.
+- Real damage photos and the presentation deck. Run the ten claims through real agents after real photos arrive, and report model agreement separately from mock-mode and unit-test results.
+
+Validation: `pytest backend` covers depreciation boundaries, paint material, invalid inputs, EXIF, pHash thresholds and the runtime index, date checks, catalogue provenance, fixture isolation, PDF text, masking and pagination, and the live claim file's escaping and labelling.
+
+Note: `data/past_claims_hashes.json` on `main` includes `CLM-EA71F41C`, which the old `remember()` recorded from a live test upload. It is kept so re-uploading that photo still demonstrates A2. New live claims go to `outputs/claim_hashes.json`.

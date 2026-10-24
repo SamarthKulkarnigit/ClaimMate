@@ -29,6 +29,12 @@ The input `claim.json` stays separate from `expected_state.json`. The answer key
 
 Regenerate from the repository root with `.venv/bin/python -m data.generate_fixtures`. Replace diagrams with authorized real photos before model evaluation; update input EXIF/hashes, expected labels and the prior-claim index together. Resolve photo paths relative to repo root.
 
+## Policy clauses (`policy/clauses.json`)
+
+Added by Role A for BM25 retrieval. `text` is intended policy wording (some entries abridged). `note` holds plain-English explanations that must not be quoted as wording. Every clause is marked `verified_against_pdf: false` until checked against the official PDF. `ADDON.ZERO_DEP` paraphrases a typical add-on, not standard wording.
+
+`past_claims_hashes.json` stays a committed one-record synthetic fixture. Completed live claims are indexed at runtime in the gitignored `outputs/claim_hashes.json`.
+
 ## Remaining materials
 
 - Official policy PDF: server download is blocked (HTTP 403); see `policy/README.md`.

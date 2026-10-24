@@ -15,8 +15,14 @@ describe('live event state', () => {
   it('requires interrupt for human review and handles errors', () => {
     expect(applyEvent(initialLive, event('agent_end')).phase).toBe('idle');
     expect(applyEvent(initialLive, event('interrupt')).phase).toBe('review');
-    expect(applyEvent(initialLive, event('error')).phase).toBe('error');
+    expect(applyEvent(initialLive, event('error', { status: 'error' })).phase).toBe('error');
     expect(applyEvent(initialLive, event('done')).phase).toBe('done');
+  });
+  it('keeps running after a recoverable agent error and lights the coordinator', () => {
+    const running = applyEvent(initialLive, event('agent_start'));
+    const recovered = applyEvent(running, { ...event('error'), agent: 'damage' });
+    expect(recovered.phase).toBe('running'); expect(recovered.statuses.damage).toBe('failed');
+    expect(applyEvent(initialLive, { ...event('message'), agent: 'coordinator' }).statuses.coordinator).toBe('complete');
   });
   it('does not mutate existing state or reduce known retries', () => {
     const state = applyEvent(initialLive, event('send_back', { retries: 2 }));

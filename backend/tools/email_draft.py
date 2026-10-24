@@ -8,7 +8,7 @@ def mask(value) -> str:
 
 def redact(text, state: dict) -> str:
     result = str(text or "")
-    for value in (state.get("vehicle", {}).get("reg_no"), state.get("policy", {}).get("policy_no")):
+    for value in ((state.get("vehicle") or {}).get("reg_no"), (state.get("policy") or {}).get("policy_no")):
         if value:
             result = result.replace(str(value), mask(value))
     return result
