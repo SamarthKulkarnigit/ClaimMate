@@ -1,0 +1,23 @@
+Subject: Motor own damage claim review - DEMO-003
+
+SYNTHETIC TEST FIXTURE - not a real claim.
+
+Dear Claims Team,
+
+Please review the attached claim assessment and supporting evidence.
+Vehicle: Maruti Suzuki Swift / ****0000
+Policy: ************0001
+Accident date: 2026-10-23
+Incident: I was rear-ended while stopped at a traffic signal.
+Estimated payable: INR 2,474.50 - 3,074.50 (estimate)
+Audit: escalate
+Review decision: pending
+
+The range uses source-linked parts prices and assumed labour rates. Coverage,
+fitment, add-ons and the final settlement remain subject to insurer verification.
+Please advise on the required documents and surveyor appointment, if applicable.
+
+Regards,
+Policyholder
+
+DRAFT ONLY - not sent. Full identifiers should be supplied through the insurer's secure channel.
